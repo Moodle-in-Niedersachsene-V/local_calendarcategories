@@ -1,0 +1,520 @@
+/* =============================================================
+   local_calendarcategories – Haupt-Stylesheet
+   Moodle in Niedersachsen e. V. | GPL v3+
+   ============================================================= */
+
+/* ── Layout ────────────────────────────────────────────────── */
+.lcc-page {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.lcc-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: .5rem;
+    padding: .75rem 1rem;
+    background: var(--bs-light, #f8f9fa);
+    border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+    border-radius: .375rem .375rem 0 0;
+}
+
+.lcc-toolbar-left,
+.lcc-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    flex-wrap: wrap;
+}
+
+/* ── View toggle ────────────────────────────────────────────── */
+.lcc-view-toggle .btn {
+    min-width: 5rem;
+}
+
+/* ── Sidebar + main grid ────────────────────────────────────── */
+.lcc-body {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    min-height: 520px;
+    border: 1px solid var(--bs-border-color, #dee2e6);
+    border-top: 0;
+    border-radius: 0 0 .375rem .375rem;
+    overflow: hidden;
+}
+
+.lcc-sidebar {
+    border-right: 1px solid var(--bs-border-color, #dee2e6);
+    background: var(--bs-light, #f8f9fa);
+    padding: 1rem;
+    overflow-y: auto;
+}
+
+.lcc-sidebar-section {
+    margin-bottom: 1.25rem;
+}
+
+.lcc-sidebar-section h6 {
+    font-size: .7rem;
+    font-weight: 600;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--bs-secondary, #6c757d);
+    margin-bottom: .5rem;
+}
+
+/* Category list items */
+.lcc-cat-item {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .35rem .5rem;
+    border-radius: .25rem;
+    cursor: pointer;
+    font-size: .875rem;
+    user-select: none;
+    border: none;
+    background: transparent;
+    width: 100%;
+    text-align: left;
+    color: var(--bs-body-color, #212529);
+}
+
+.lcc-cat-item:hover {
+    background: rgba(0,0,0,.05);
+}
+
+.lcc-cat-item.active {
+    background: rgba(0,0,0,.07);
+    font-weight: 500;
+}
+
+.lcc-cat-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 1px solid rgba(0,0,0,.1);
+}
+
+.lcc-cat-check {
+    margin-left: auto;
+    font-size: .75rem;
+    opacity: .6;
+}
+
+/* ── Calendar grid (month view) ─────────────────────────────── */
+.lcc-main {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    overflow: auto;
+}
+
+.lcc-cal-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+    background: var(--bs-light, #f8f9fa);
+}
+
+.lcc-cal-header div {
+    text-align: center;
+    font-size: .75rem;
+    font-weight: 600;
+    color: var(--bs-secondary, #6c757d);
+    padding: .4rem 0;
+}
+
+.lcc-cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    flex: 1;
+}
+
+.lcc-day {
+    border-right: 1px solid var(--bs-border-color, #dee2e6);
+    border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+    padding: .35rem;
+    min-height: 90px;
+    cursor: pointer;
+    transition: background .1s;
+}
+
+.lcc-day:hover {
+    background: rgba(0,0,0,.02);
+}
+
+.lcc-day.other-month {
+    background: var(--bs-light, #f8f9fa);
+}
+
+.lcc-day.other-month .lcc-day-num {
+    opacity: .35;
+}
+
+.lcc-day-num {
+    font-size: .75rem;
+    font-weight: 500;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin-bottom: .2rem;
+}
+
+.lcc-day.today .lcc-day-num {
+    background: #0d6efd;
+    color: #fff;
+}
+
+/* Event pills */
+.lcc-pill {
+    display: block;
+    border-radius: 3px;
+    padding: 1px 5px;
+    font-size: .7rem;
+    font-weight: 500;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    border: none;
+    text-align: left;
+    width: 100%;
+}
+
+.lcc-pill:hover {
+    filter: brightness(.9);
+}
+
+.lcc-more {
+    font-size: .65rem;
+    color: var(--bs-secondary, #6c757d);
+    padding: 1px 5px;
+}
+
+/* ── Week view ──────────────────────────────────────────────── */
+.lcc-week-grid {
+    display: grid;
+    grid-template-columns: 48px repeat(7, 1fr);
+    flex: 1;
+    overflow-y: auto;
+}
+
+.lcc-week-header {
+    display: grid;
+    grid-template-columns: 48px repeat(7, 1fr);
+    border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+    background: var(--bs-light, #f8f9fa);
+}
+
+.lcc-week-header-day {
+    text-align: center;
+    padding: .4rem .2rem;
+    font-size: .75rem;
+}
+
+.lcc-week-header-day span {
+    display: block;
+    font-weight: 600;
+    color: var(--bs-secondary, #6c757d);
+    text-transform: uppercase;
+    font-size: .65rem;
+}
+
+.lcc-week-header-day .lcc-day-num {
+    margin: .2rem auto 0;
+}
+
+.lcc-hour-label {
+    font-size: .65rem;
+    color: var(--bs-secondary, #6c757d);
+    text-align: right;
+    padding-right: .4rem;
+    padding-top: .15rem;
+    border-right: 1px solid var(--bs-border-color, #dee2e6);
+    height: 48px;
+    box-sizing: border-box;
+}
+
+.lcc-week-col {
+    border-right: 1px solid var(--bs-border-color, #dee2e6);
+    position: relative;
+    min-height: 48px;
+    border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+}
+
+/* ── List view ──────────────────────────────────────────────── */
+.lcc-list {
+    padding: 1rem;
+    overflow-y: auto;
+}
+
+.lcc-list-month {
+    font-size: .8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--bs-secondary, #6c757d);
+    margin: 1rem 0 .5rem;
+    padding-bottom: .25rem;
+    border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+}
+
+.lcc-list-month:first-child {
+    margin-top: 0;
+}
+
+.lcc-list-event {
+    display: flex;
+    align-items: flex-start;
+    gap: .75rem;
+    padding: .6rem .75rem;
+    border-radius: .375rem;
+    margin-bottom: .3rem;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background .1s, border-color .1s;
+}
+
+.lcc-list-event:hover {
+    background: rgba(0,0,0,.03);
+    border-color: var(--bs-border-color, #dee2e6);
+}
+
+.lcc-list-date {
+    min-width: 40px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.lcc-list-date .day {
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.lcc-list-date .dow {
+    font-size: .65rem;
+    text-transform: uppercase;
+    color: var(--bs-secondary, #6c757d);
+}
+
+.lcc-list-bar {
+    width: 3px;
+    border-radius: 2px;
+    flex-shrink: 0;
+    align-self: stretch;
+    min-height: 36px;
+}
+
+.lcc-list-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.lcc-list-title {
+    font-size: .9rem;
+    font-weight: 500;
+    margin-bottom: .15rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.lcc-list-meta {
+    font-size: .75rem;
+    color: var(--bs-secondary, #6c757d);
+}
+
+.lcc-list-empty {
+    text-align: center;
+    color: var(--bs-secondary, #6c757d);
+    padding: 3rem 1rem;
+    font-size: .9rem;
+}
+
+/* ── Mobile nav bar (bottom) ────────────────────────────────── */
+.lcc-mobile-nav {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-top: 1px solid var(--bs-border-color, #dee2e6);
+    z-index: 1050;
+    padding: .25rem 0 env(safe-area-inset-bottom, .25rem);
+}
+
+.lcc-mobile-nav .lcc-mobile-nav-inner {
+    display: flex;
+    justify-content: space-around;
+}
+
+.lcc-mobile-nav-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: .4rem .75rem;
+    font-size: .65rem;
+    font-weight: 500;
+    color: var(--bs-secondary, #6c757d);
+    border: none;
+    background: transparent;
+    border-radius: .25rem;
+    cursor: pointer;
+    min-width: 56px;
+}
+
+.lcc-mobile-nav-btn i {
+    font-size: 1.25rem;
+}
+
+.lcc-mobile-nav-btn.active {
+    color: #0d6efd;
+}
+
+.lcc-fab {
+    position: fixed;
+    bottom: 4.5rem;
+    right: 1rem;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #0d6efd;
+    color: #fff;
+    border: none;
+    font-size: 1.4rem;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 10px rgba(0,0,0,.2);
+    z-index: 1049;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+/* ── Responsive breakpoints ─────────────────────────────────── */
+@media (max-width: 768px) {
+
+    .lcc-body {
+        grid-template-columns: 1fr;
+    }
+
+    .lcc-sidebar {
+        display: none;  /* shown via off-canvas on mobile */
+        border-right: 0;
+        border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+    }
+
+    .lcc-sidebar.show {
+        display: block;
+    }
+
+    .lcc-toolbar {
+        padding: .5rem .75rem;
+    }
+
+    .lcc-toolbar-left .lcc-month-label {
+        font-size: .95rem;
+    }
+
+    /* Shrink day cells on small screens */
+    .lcc-day {
+        padding: .2rem;
+        min-height: 56px;
+    }
+
+    .lcc-pill {
+        font-size: .6rem;
+        padding: 1px 3px;
+    }
+
+    .lcc-day-num {
+        font-size: .7rem;
+        width: 18px;
+        height: 18px;
+    }
+
+    /* Show mobile nav + FAB */
+    .lcc-mobile-nav {
+        display: block;
+    }
+
+    .lcc-fab {
+        display: flex;
+    }
+
+    /* Push content above bottom nav */
+    .lcc-page {
+        padding-bottom: 4rem;
+    }
+
+    /* Hide desktop view-toggle in toolbar (use bottom nav instead) */
+    .lcc-view-toggle {
+        display: none;
+    }
+
+    /* List view larger touch targets */
+    .lcc-list-event {
+        padding: .75rem;
+        margin-bottom: .4rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .lcc-cal-header div {
+        font-size: .65rem;
+    }
+
+    .lcc-day {
+        min-height: 44px;
+    }
+
+    /* On very small screens hide time in pills */
+    .lcc-pill-time {
+        display: none;
+    }
+}
+
+/* ── Offcanvas sidebar (mobile) ─────────────────────────────── */
+.lcc-offcanvas-cats {
+    max-width: 80vw;
+}
+
+/* ── Detail modal ───────────────────────────────────────────── */
+.lcc-event-cat-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    border-radius: .25rem;
+    padding: .2rem .6rem;
+    font-size: .8rem;
+    font-weight: 500;
+}
+
+/* ── Empty state ────────────────────────────────────────────── */
+.lcc-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 1rem;
+    color: var(--bs-secondary, #6c757d);
+    text-align: center;
+    gap: .75rem;
+}
+
+.lcc-empty i {
+    font-size: 2.5rem;
+    opacity: .35;
+}

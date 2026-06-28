@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="local/calendarcategories/db" VERSION="2026062817"
+       COMMENT="local_calendarcategories database schema"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
+  <TABLES>
+
+    <TABLE NAME="local_calcategories" COMMENT="Custom calendar event categories">
+      <FIELDS>
+        <FIELD NAME="id"           TYPE="int"  LENGTH="10"  NOTNULL="true"  SEQUENCE="true"/>
+        <FIELD NAME="name"         TYPE="char" LENGTH="255" NOTNULL="true"/>
+        <FIELD NAME="description"  TYPE="text"              NOTNULL="false"/>
+        <FIELD NAME="color"        TYPE="char" LENGTH="7"   NOTNULL="true"  DEFAULT="#3a87ad" COMMENT="Hex color code for UI display"/>
+        <FIELD NAME="contextid"    TYPE="int"  LENGTH="10"  NOTNULL="true"  DEFAULT="0" COMMENT="Moodle context this category belongs to"/>
+        <FIELD NAME="sortorder"    TYPE="int"  LENGTH="10"  NOTNULL="true"  DEFAULT="0"/>
+        <FIELD NAME="visible"      TYPE="int"  LENGTH="1"   NOTNULL="true"  DEFAULT="1"/>
+        <FIELD NAME="timecreated"  TYPE="int"  LENGTH="10"  NOTNULL="true"  DEFAULT="0"/>
+        <FIELD NAME="timemodified" TYPE="int"  LENGTH="10"  NOTNULL="true"  DEFAULT="0"/>
+        <FIELD NAME="usermodified" TYPE="int"  LENGTH="10"  NOTNULL="true"  DEFAULT="0"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary"         TYPE="primary" FIELDS="id"/>
+        <KEY NAME="fk_context"      TYPE="foreign" FIELDS="contextid"    REFTABLE="context" REFFIELDS="id"/>
+        <KEY NAME="fk_usermodified" TYPE="foreign" FIELDS="usermodified" REFTABLE="user"    REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="idx_contextid_visible" UNIQUE="false" FIELDS="contextid, visible"/>
+      </INDEXES>
+    </TABLE>
+
+    <TABLE NAME="local_calcategory_members" COMMENT="Members assigned to a calendar category">
+      <FIELDS>
+        <FIELD NAME="id"          TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="categoryid"  TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="userid"      TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary"     TYPE="primary" FIELDS="id"/>
+        <KEY NAME="fk_category" TYPE="foreign" FIELDS="categoryid" REFTABLE="local_calcategories" REFFIELDS="id"/>
+        <KEY NAME="fk_user"     TYPE="foreign" FIELDS="userid"     REFTABLE="user"                REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="idx_cat_user" UNIQUE="true" FIELDS="categoryid, userid"/>
+      </INDEXES>
+    </TABLE>
+
+    <TABLE NAME="local_calcategory_events" COMMENT="Links calendar events to custom categories">
+      <FIELDS>
+        <FIELD NAME="id"          TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="categoryid"  TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="eventid"     TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="References mdl_event.id"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary"     TYPE="primary" FIELDS="id"/>
+        <KEY NAME="fk_category" TYPE="foreign" FIELDS="categoryid" REFTABLE="local_calcategories" REFFIELDS="id"/>
+        <KEY NAME="fk_event"    TYPE="foreign" FIELDS="eventid"    REFTABLE="event"               REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="idx_cat_event" UNIQUE="true" FIELDS="categoryid, eventid"/>
+      </INDEXES>
+    </TABLE>
+
+  </TABLES>
+</XMLDB>
