@@ -1,9 +1,18 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
+// This file is part of Moodle - https://moodle.org/.
 //
-// @package    local_calendarcategories
-// @copyright  2026 Moodle in Niedersachsen e. V.
-// @license    https://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3 or later
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
  * Add / edit an event in a calendar category.
@@ -60,11 +69,10 @@ $PAGE->set_heading($PAGE->title);
 
 // ── Moodle form ─────────────────────────────────────────────────────────────
 class local_calendarcategories_event_form extends moodleform {
-
     public function definition(): void {
         $mform   = $this->_form;
         $catopts = $this->_customdata['catoptions'];
-        $isEdit  = !empty($this->_customdata['eventid']);
+        $is_edit  = !empty($this->_customdata['eventid']);
 
         // Title.
         $mform->addElement('text', 'name', get_string('eventtitle', 'local_calendarcategories'));
@@ -73,43 +81,57 @@ class local_calendarcategories_event_form extends moodleform {
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
 
         // Category.
-        $mform->addElement('select', 'categoryid',
-            get_string('categoryname', 'local_calendarcategories'), $catopts);
+        $mform->addElement(
+            'select',
+            'categoryid',
+            get_string('categoryname', 'local_calendarcategories'),
+            $catopts
+        );
         $mform->addRule('categoryid', null, 'required', null, 'client');
 
         // Date.
-        $mform->addElement('date_time_selector', 'timestart',
+        $mform->addElement(
+            'date_time_selector',
+            'timestart',
             get_string('eventstarttime', 'local_calendarcategories'),
-            ['optional' => false]);
+            ['optional' => false]
+        );
         $mform->addRule('timestart', null, 'required', null, 'client');
 
         // Duration.
         $duropts = [
-            0        => get_string('durnone',  'local_calendarcategories'),
-            1800     => get_string('dur30min',  'local_calendarcategories'),
-            3600     => get_string('dur1h',     'local_calendarcategories'),
-            5400     => get_string('dur90min',  'local_calendarcategories'),
-            7200     => get_string('dur2h',     'local_calendarcategories'),
-            86400    => get_string('dur1day',   'local_calendarcategories'),
+            0        => get_string('durnone', 'local_calendarcategories'),
+            1800     => get_string('dur30min', 'local_calendarcategories'),
+            3600     => get_string('dur1h', 'local_calendarcategories'),
+            5400     => get_string('dur90min', 'local_calendarcategories'),
+            7200     => get_string('dur2h', 'local_calendarcategories'),
+            86400    => get_string('dur1day', 'local_calendarcategories'),
         ];
-        $mform->addElement('select', 'timeduration',
-            get_string('eventduration', 'local_calendarcategories'), $duropts);
+        $mform->addElement(
+            'select',
+            'timeduration',
+            get_string('eventduration', 'local_calendarcategories'),
+            $duropts
+        );
 
         // Location.
         $mform->addElement('text', 'location', get_string('eventlocation', 'local_calendarcategories'));
         $mform->setType('location', PARAM_TEXT);
 
         // Description.
-        $mform->addElement('textarea', 'description',
+        $mform->addElement(
+            'textarea',
+            'description',
             get_string('eventdescription', 'local_calendarcategories'),
-            ['rows' => 4, 'cols' => 40, 'class' => 'w-100']);
+            ['rows' => 4, 'cols' => 40, 'class' => 'w-100']
+        );
         $mform->setType('description', PARAM_CLEANHTML);
 
         // Hidden fields.
         $mform->addElement('hidden', 'eventid');
         $mform->setType('eventid', PARAM_INT);
 
-        $this->add_action_buttons(true, $isEdit
+        $this->add_action_buttons(true, $is_edit
             ? get_string('savechanges')
             : get_string('addevent', 'local_calendarcategories'));
     }
@@ -135,14 +157,14 @@ if ($existing) {
         'location'     => $existing->location ?? '',
         'description'  => $existing->description ?? '',
     ]);
-} elseif ($prefdate) {
+} else if ($prefdate) {
     $form->set_data(['timestart' => strtotime($prefdate . ' 09:00:00')]);
 }
 
 // ── Handle submission ────────────────────────────────────────────────────────
 if ($form->is_cancelled()) {
     redirect(new moodle_url('/local/calendarcategories/view.php'));
-} elseif ($data = $form->get_data()) {
+} else if ($data = $form->get_data()) {
     if ($data->eventid) {
         \local_calendarcategories\event_manager::update_event($data->eventid, (array)$data);
         $msg = get_string('eventupdated', 'local_calendarcategories');
@@ -181,10 +203,10 @@ $catcolors = [];
 foreach ($mycats as $cat) {
     $catcolors[(int)$cat->id] = $cat->color;
 }
-$catcolorsJson = json_encode($catcolors);
+$catcolors_json = json_encode($catcolors);
 echo html_writer::tag('script', "
 (function(){
-  var colors = {$catcolorsJson};
+  var colors = {$catcolors_json};
   var sel = document.querySelector('[name=categoryid]');
   var bar = document.getElementById('lcc-cat-preview');
   if (!sel || !bar) return;

@@ -8,14 +8,14 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <https://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Plugin version and other meta-data.
+ * Hook callback registrations for local_calendarcategories.
  *
  * @package    local_calendarcategories
  * @copyright  2026 Moodle in Niedersachsen e. V.
@@ -24,8 +24,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'local_calendarcategories';
-$plugin->version   = 2026062817;
-$plugin->requires  = 2024042200; // Moodle 5.0
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '1.1.0';
+$callbacks = [
+    [
+        'hook'     => \core\hook\after_config::class,
+        'callback' => \local_calendarcategories\hook\after_config::class . '::callback',
+        'priority' => 500,
+    ],
+];

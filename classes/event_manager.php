@@ -1,9 +1,18 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
+// This file is part of Moodle - https://moodle.org/.
 //
-// @package    local_calendarcategories
-// @copyright  2026 Moodle in Niedersachsen e. V.
-// @license    https://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3 or later
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 namespace local_calendarcategories;
 
@@ -26,7 +35,6 @@ require_once($CFG->dirroot . '/calendar/lib.php');
  * @license    https://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3 or later
  */
 class event_manager {
-
     /**
      * Create a new event and link it to a category.
      *
@@ -41,12 +49,12 @@ class event_manager {
      * @throws \moodle_exception
      */
     public static function create_event(
-        int    $categoryid,
+        int $categoryid,
         string $name,
-        int    $timestart,
-        int    $timeduration = 0,
-        string $description  = '',
-        string $location     = ''
+        int $timestart,
+        int $timeduration = 0,
+        string $description = '',
+        string $location = ''
     ): int {
         global $DB, $USER;
 
@@ -64,12 +72,12 @@ class event_manager {
         }
 
         // Build the Moodle calendar event record.
-        $eventdata = (object)[
+        $event_data = (object)[
             'name'           => clean_param($name, PARAM_TEXT),
             'description'    => clean_param($description, PARAM_CLEANHTML),
             'format'         => FORMAT_HTML,
             'location'       => clean_param($location, PARAM_TEXT),
-            'courseid'       => 0,           // site-level event
+            'courseid'       => 0, // site-level event
             'groupid'        => 0,
             'userid'         => (int)$USER->id,
             'modulename'     => '',
@@ -82,7 +90,7 @@ class event_manager {
         ];
 
         // Use Moodle's calendar API so hooks/observers fire correctly.
-        $event   = \calendar_event::create($eventdata, false);
+        $event   = \calendar_event::create($event_data, false);
         $eventid = (int)$event->id;
 
         // Link to category.
@@ -112,7 +120,7 @@ class event_manager {
         $context = \context::instance_by_id($cat->contextid, MUST_EXIST);
         require_capability('local/calendarcategories:addevent', $context);
 
-        $calevent = \calendar_event::load($eventid);
+        $cal_event = \calendar_event::load($eventid);
 
         $update = new \stdClass();
         if (isset($data['name'])) {
@@ -131,7 +139,7 @@ class event_manager {
             $update->location = clean_param($data['location'], PARAM_TEXT);
         }
 
-        $calevent->update($update, false);
+        $cal_event->update($update, false);
         return true;
     }
 
@@ -153,8 +161,8 @@ class event_manager {
         $context = \context::instance_by_id($cat->contextid, MUST_EXIST);
         require_capability('local/calendarcategories:addevent', $context);
 
-        $calevent = \calendar_event::load($eventid);
-        $calevent->delete();   // Observer cleans up local_calcategory_events automatically.
+        $cal_event = \calendar_event::load($eventid);
+        $cal_event->delete();   // Observer cleans up local_calcategory_events automatically.
 
         return true;
     }

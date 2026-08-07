@@ -1,9 +1,18 @@
 <?php
 // This file is part of Moodle - https://moodle.org/
 //
-// @package    local_calendarcategories
-// @copyright  2026 Moodle in Niedersachsen e. V.
-// @license    https://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3 or later
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 namespace local_calendarcategories\privacy;
 
@@ -31,7 +40,6 @@ class provider implements
     \core_privacy\local\metadata\provider,
     \core_privacy\local\request\core_userlist_provider,
     \core_privacy\local\request\plugin\provider {
-
     public static function get_metadata(collection $collection): collection {
 
         $collection->add_database_table(
@@ -110,10 +118,13 @@ class provider implements
     public static function delete_data_for_all_users_in_context(\context $context): void {
         global $DB;
         $categoryids = $DB->get_fieldset_select(
-            'local_calcategories', 'id', 'contextid = :contextid', ['contextid' => $context->id]
+            'local_calcategories',
+            'id',
+            'contextid = :contextid',
+            ['contextid' => $context->id]
         );
         if ($categoryids) {
-            list($in, $params) = $DB->get_in_or_equal($categoryids, SQL_PARAMS_NAMED);
+            [$in, $params] = $DB->get_in_or_equal($categoryids, SQL_PARAMS_NAMED);
             $DB->delete_records_select('local_calcategory_members', "categoryid $in", $params);
         }
     }
@@ -123,13 +134,19 @@ class provider implements
         $userid = (int)$contextlist->get_user()->id;
         foreach ($contextlist->get_contexts() as $context) {
             $categoryids = $DB->get_fieldset_select(
-                'local_calcategories', 'id', 'contextid = :contextid', ['contextid' => $context->id]
+                'local_calcategories',
+                'id',
+                'contextid = :contextid',
+                ['contextid' => $context->id]
             );
             if ($categoryids) {
-                list($in, $params) = $DB->get_in_or_equal($categoryids, SQL_PARAMS_NAMED);
+                [$in, $params] = $DB->get_in_or_equal($categoryids, SQL_PARAMS_NAMED);
                 $params['userid'] = $userid;
-                $DB->delete_records_select('local_calcategory_members',
-                    "categoryid $in AND userid = :userid", $params);
+                $DB->delete_records_select(
+                    'local_calcategory_members',
+                    "categoryid $in AND userid = :userid",
+                    $params
+                );
             }
         }
     }
@@ -142,13 +159,19 @@ class provider implements
             return;
         }
         $categoryids = $DB->get_fieldset_select(
-            'local_calcategories', 'id', 'contextid = :contextid', ['contextid' => $contextid]
+            'local_calcategories',
+            'id',
+            'contextid = :contextid',
+            ['contextid' => $contextid]
         );
         if ($categoryids) {
-            list($incat, $catparams) = $DB->get_in_or_equal($categoryids, SQL_PARAMS_NAMED, 'cat');
-            list($inusr, $usrparams) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'usr');
-            $DB->delete_records_select('local_calcategory_members',
-                "categoryid $incat AND userid $inusr", array_merge($catparams, $usrparams));
+            [$incat, $catparams] = $DB->get_in_or_equal($categoryids, SQL_PARAMS_NAMED, 'cat');
+            [$inusr, $usrparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'usr');
+            $DB->delete_records_select(
+                'local_calcategory_members',
+                "categoryid $incat AND userid $inusr",
+                array_merge($catparams, $usrparams)
+            );
         }
     }
 }

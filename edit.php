@@ -1,9 +1,18 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
+// This file is part of Moodle - https://moodle.org/.
 //
-// @package    local_calendarcategories
-// @copyright  2026 Moodle in Niedersachsen e. V.
-// @license    https://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3 or later
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/formslib.php');
@@ -32,13 +41,20 @@ class local_calendarcategories_edit_form extends moodleform {
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
 
-        $mform->addElement('textarea', 'description',
+        $mform->addElement(
+            'textarea',
+            'description',
             get_string('categorydescription', 'local_calendarcategories'),
-            ['rows' => 3, 'cols' => 50]);
+            ['rows' => 3, 'cols' => 50]
+        );
         $mform->setType('description', PARAM_CLEANHTML);
 
-        $mform->addElement('text', 'color',
-            get_string('color', 'local_calendarcategories'), ['size' => 7, 'maxlength' => 7]);
+        $mform->addElement(
+            'text',
+            'color',
+            get_string('color', 'local_calendarcategories'),
+            ['size' => 7, 'maxlength' => 7]
+        );
         $mform->setType('color', PARAM_RAW);  // validated server-side in manager.
         $mform->setDefault('color', '#3a87ad');
         $mform->addHelpButton('color', 'color', 'local_calendarcategories');
@@ -77,7 +93,7 @@ if ($category) {
 
 if ($form->is_cancelled()) {
     redirect(new moodle_url('/local/calendarcategories/manage.php'));
-} elseif ($data = $form->get_data()) {
+} else if ($data = $form->get_data()) {
     if ($data->id) {
         \local_calendarcategories\category_manager::update($data->id, (array)$data);
         $msg = get_string('categoryupdated', 'local_calendarcategories');
@@ -105,7 +121,7 @@ if ($form->is_cancelled()) {
 echo $OUTPUT->header();
 $heading = $id
     ? get_string('editcategory', 'local_calendarcategories')
-    : get_string('addcategory',  'local_calendarcategories');
+    : get_string('addcategory', 'local_calendarcategories');
 echo $OUTPUT->heading($heading);
 $form->display();
 echo $OUTPUT->footer();

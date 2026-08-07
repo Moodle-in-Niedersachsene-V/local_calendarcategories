@@ -1,9 +1,18 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
+// This file is part of Moodle - https://moodle.org/.
 //
-// @package    local_calendarcategories
-// @copyright  2026 Moodle in Niedersachsen e. V.
-// @license    https://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3 or later
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 namespace local_calendarcategories;
 
@@ -20,13 +29,12 @@ defined('MOODLE_INTERNAL') || die();
  * @license    https://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3 or later
  */
 class category_manager {
-
     /**
      * Create a new calendar category.
      *
      * @param  string $name        Human-readable name.
      * @param  string $color       Hex color, e.g. '#3a87ad'.
-     * @param  int    $contextid   Moodle context id (system, coursecat, …).
+     * @param  int    $context_id   Moodle context id (system, coursecat, …).
      * @param  string $description Optional description.
      * @param  int    $sortorder   Sort position.
      * @return int    New category id.
@@ -35,15 +43,15 @@ class category_manager {
     public static function create(
         string $name,
         string $color = '#3a87ad',
-        int $contextid = 0,
+        int $context_id = 0,
         string $description = '',
         int $sortorder = 0
     ): int {
         global $DB, $USER;
 
         // Capability check.
-        $context = $contextid
-            ? \context::instance_by_id($contextid, MUST_EXIST)
+        $context = $context_id
+            ? \context::instance_by_id($context_id, MUST_EXIST)
             : \context_system::instance();
         require_capability('local/calendarcategories:manage', $context);
 
@@ -115,7 +123,7 @@ class category_manager {
         require_capability('local/calendarcategories:manage', $context);
 
         $DB->delete_records('local_calcategory_members', ['categoryid' => $id]);
-        $DB->delete_records('local_calcategory_events',  ['categoryid' => $id]);
+        $DB->delete_records('local_calcategory_events', ['categoryid' => $id]);
         return $DB->delete_records('local_calcategories', ['id' => $id]);
     }
 
@@ -166,8 +174,10 @@ class category_manager {
         $context  = \context::instance_by_id($category->contextid, MUST_EXIST);
         require_capability('local/calendarcategories:manage', $context);
 
-        return (bool)$DB->delete_records('local_calcategory_members',
-            ['categoryid' => $categoryid, 'userid' => $userid]);
+        return (bool)$DB->delete_records(
+            'local_calcategory_members',
+            ['categoryid' => $categoryid, 'userid' => $userid]
+        );
     }
 
     /**
@@ -262,7 +272,7 @@ class category_manager {
     }
 
     // -----------------------------------------------------------------------
-    // Internal helpers
+    // Internal helpers.
     // -----------------------------------------------------------------------
 
     /**
