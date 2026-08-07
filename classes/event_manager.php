@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - https://moodle.org/.
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,8 +15,6 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 namespace local_calendarcategories;
-
-defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/calendar/lib.php');
@@ -72,12 +70,12 @@ class event_manager {
         }
 
         // Build the Moodle calendar event record.
-        $event_data = (object)[
+        $eventData = (object)[
             'name'           => clean_param($name, PARAM_TEXT),
             'description'    => clean_param($description, PARAM_CLEANHTML),
             'format'         => FORMAT_HTML,
             'location'       => clean_param($location, PARAM_TEXT),
-            'courseid'       => 0, // site-level event
+            'courseid'       => 0, // Site-level event.
             'groupid'        => 0,
             'userid'         => (int)$USER->id,
             'modulename'     => '',
@@ -90,7 +88,7 @@ class event_manager {
         ];
 
         // Use Moodle's calendar API so hooks/observers fire correctly.
-        $event   = \calendar_event::create($event_data, false);
+        $event   = \calendar_event::create($eventData, false);
         $eventid = (int)$event->id;
 
         // Link to category.
@@ -120,7 +118,7 @@ class event_manager {
         $context = \context::instance_by_id($cat->contextid, MUST_EXIST);
         require_capability('local/calendarcategories:addevent', $context);
 
-        $cal_event = \calendar_event::load($eventid);
+        $calEvent = \calendar_event::load($eventid);
 
         $update = new \stdClass();
         if (isset($data['name'])) {
@@ -139,7 +137,7 @@ class event_manager {
             $update->location = clean_param($data['location'], PARAM_TEXT);
         }
 
-        $cal_event->update($update, false);
+        $calEvent->update($update, false);
         return true;
     }
 
@@ -161,8 +159,8 @@ class event_manager {
         $context = \context::instance_by_id($cat->contextid, MUST_EXIST);
         require_capability('local/calendarcategories:addevent', $context);
 
-        $cal_event = \calendar_event::load($eventid);
-        $cal_event->delete();   // Observer cleans up local_calcategory_events automatically.
+        $calEvent = \calendar_event::load($eventid);
+        $calEvent->delete();   // Observer cleans up local_calcategory_events automatically.
 
         return true;
     }

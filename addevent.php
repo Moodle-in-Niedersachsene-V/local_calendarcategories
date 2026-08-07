@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - https://moodle.org/.
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,6 +19,14 @@
  *
  * Access: local/calendarcategories:addevent (CONTEXT_SYSTEM).
  * Pre-fill date via ?date=YYYY-MM-DD, edit existing via ?eventid=N.
+ */
+
+/**
+ * Add or edit a calendar group event.
+ *
+ * @package    local_calendarcategories
+ * @copyright  2026 Moodle in Niedersachsen e. V.
+ * @license    https://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3 or later
  */
 
 require_once(__DIR__ . '/../../config.php');
@@ -68,11 +76,21 @@ $PAGE->set_title($existing
 $PAGE->set_heading($PAGE->title);
 
 // ── Moodle form ─────────────────────────────────────────────────────────────
+/**
+ * Form for creating or editing a calendar group event.
+ *
+ * @package    local_calendarcategories
+ * @copyright  2026 Moodle in Niedersachsen e. V.
+ * @license    https://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3 or later
+ */
 class local_calendarcategories_event_form extends moodleform {
+    /**
+     * Define the form fields.
+     */
     public function definition(): void {
         $mform   = $this->_form;
         $catopts = $this->_customdata['catoptions'];
-        $is_edit  = !empty($this->_customdata['eventid']);
+        $isEdit  = !empty($this->_customdata['eventid']);
 
         // Title.
         $mform->addElement('text', 'name', get_string('eventtitle', 'local_calendarcategories'));
@@ -131,7 +149,7 @@ class local_calendarcategories_event_form extends moodleform {
         $mform->addElement('hidden', 'eventid');
         $mform->setType('eventid', PARAM_INT);
 
-        $this->add_action_buttons(true, $is_edit
+        $this->add_action_buttons(true, $isEdit
             ? get_string('savechanges')
             : get_string('addevent', 'local_calendarcategories'));
     }
@@ -203,10 +221,10 @@ $catcolors = [];
 foreach ($mycats as $cat) {
     $catcolors[(int)$cat->id] = $cat->color;
 }
-$catcolors_json = json_encode($catcolors);
+$catcolorsJson = json_encode($catcolors);
 echo html_writer::tag('script', "
 (function(){
-  var colors = {$catcolors_json};
+  var colors = {$catcolorsJson};
   var sel = document.querySelector('[name=categoryid]');
   var bar = document.getElementById('lcc-cat-preview');
   if (!sel || !bar) return;

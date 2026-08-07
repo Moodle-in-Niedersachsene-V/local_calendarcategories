@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - https://moodle.org/.
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,8 +15,6 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 namespace local_calendarcategories;
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Core manager for custom calendar categories.
@@ -34,7 +32,7 @@ class category_manager {
      *
      * @param  string $name        Human-readable name.
      * @param  string $color       Hex color, e.g. '#3a87ad'.
-     * @param  int    $context_id   Moodle context id (system, coursecat, …).
+     * @param  int    $contextId   Moodle context id (system, coursecat, …).
      * @param  string $description Optional description.
      * @param  int    $sortorder   Sort position.
      * @return int    New category id.
@@ -43,15 +41,15 @@ class category_manager {
     public static function create(
         string $name,
         string $color = '#3a87ad',
-        int $context_id = 0,
+        int $contextId = 0,
         string $description = '',
         int $sortorder = 0
     ): int {
         global $DB, $USER;
 
         // Capability check.
-        $context = $context_id
-            ? \context::instance_by_id($context_id, MUST_EXIST)
+        $context = $contextId
+            ? \context::instance_by_id($contextId, MUST_EXIST)
             : \context_system::instance();
         require_capability('local/calendarcategories:manage', $context);
 

@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - https://moodle.org/.
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -32,7 +32,17 @@ $PAGE->set_pagelayout('admin');
 // ---------------------------------------------------------------------------
 // Inline form definition.
 // ---------------------------------------------------------------------------
+/**
+ * Form for creating or editing a calendar group.
+ *
+ * @package    local_calendarcategories
+ * @copyright  2026 Moodle in Niedersachsen e. V.
+ * @license    https://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3 or later
+ */
 class local_calendarcategories_edit_form extends moodleform {
+    /**
+     * Define the form fields.
+     */
     public function definition(): void {
         $mform = $this->_form;
 
@@ -69,6 +79,13 @@ class local_calendarcategories_edit_form extends moodleform {
         $this->add_action_buttons();
     }
 
+    /**
+     * Validate form data.
+     *
+     * @param array $data  Submitted form data.
+     * @param array $files Uploaded files.
+     * @return array Validation errors.
+     */
     public function validation($data, $files): array {
         $errors = parent::validation($data, $files);
         if (!preg_match('/^#[0-9a-fA-F]{6}$/', $data['color'] ?? '')) {

@@ -1,7 +1,7 @@
 <?php
-// This file is part of Moodle - https://moodle.org/.
+// This file is part of Moodle - https://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify.
+// Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -13,8 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Global navigation: adds node to flat nav sidebar.
@@ -29,12 +27,12 @@ function local_calendarcategories_extend_navigation(global_navigation $nav): voi
     }
 
     try {
-        $sys_context = context_system::instance();
+        $sysContext = context_system::instance();
     } catch (\Exception $e) {
         return;
     }
 
-    if (!is_siteadmin() && !has_capability('local/calendarcategories:addevent', $sys_context)) {
+    if (!is_siteadmin() && !has_capability('local/calendarcategories:addevent', $sysContext)) {
         return;
     }
 

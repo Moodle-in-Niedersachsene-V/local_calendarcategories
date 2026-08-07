@@ -63,37 +63,37 @@ $PAGE->requires->css(new moodle_url(
 
 // Data.
 $categories   = category_manager::get_visible_categories();
-$month_events = event_manager::get_month_events($year, $month);
+$monthEvents = event_manager::get_month_events($year, $month);
 $upcoming     = ($view === 'list') ? event_manager::get_upcoming_for_user(180) : [];
 
 // Group month events by date string for quick lookup.
-$ev_by_date = [];
-foreach ($month_events as $ev) {
+$evByDate = [];
+foreach ($monthEvents as $ev) {
     $d = date('Y-m-d', $ev->timestart);
-    $ev_by_date[$d][] = $ev;
+    $evByDate[$d][] = $ev;
 }
 
 // Navigation URLs.
-$prev_month    = $month === 1 ? 12 : $month - 1;
-$prev_year     = $month === 1 ? $year - 1 : $year;
-$next_month    = $month === 12 ? 1 : $month + 1;
-$next_year     = $month === 12 ? $year + 1 : $year;
-$prev_url      = new moodle_url(
+$prevMonth    = $month === 1 ? 12 : $month - 1;
+$prevYear     = $month === 1 ? $year - 1 : $year;
+$nextMonth    = $month === 12 ? 1 : $month + 1;
+$nextYear     = $month === 12 ? $year + 1 : $year;
+$prevUrl      = new moodle_url(
     '/local/calendarcategories/view.php',
-    ['view' => $view, 'year' => $prev_year, 'month' => $prev_month]
+    ['view' => $view, 'year' => $prevYear, 'month' => $prevMonth]
 );
-$next_url      = new moodle_url(
+$nextUrl      = new moodle_url(
     '/local/calendarcategories/view.php',
-    ['view' => $view, 'year' => $next_year, 'month' => $next_month]
+    ['view' => $view, 'year' => $nextYear, 'month' => $nextMonth]
 );
-$today_url     = new moodle_url(
+$todayUrl     = new moodle_url(
     '/local/calendarcategories/view.php',
     ['view' => $view, 'year' => date('Y'), 'month' => date('n')]
 );
-$addevent_url  = new moodle_url('/local/calendarcategories/addevent.php');
+$addeventUrl  = new moodle_url('/local/calendarcategories/addevent.php');
 
 // Month label.
-$month_names = [
+$monthNames = [
     1  => get_string('month_jan', 'local_calendarcategories'),
     2  => get_string('month_feb', 'local_calendarcategories'),
     3  => get_string('month_mar', 'local_calendarcategories'),
@@ -108,7 +108,7 @@ $month_names = [
     12 => get_string('month_dec', 'local_calendarcategories'),
 ];
 
-$can_add = has_capability('local/calendarcategories:addevent', $context) && !empty($categories);
+$canAdd = has_capability('local/calendarcategories:addevent', $context) && !empty($categories);
 
 echo $OUTPUT->header();
 
@@ -126,18 +126,18 @@ echo html_writer::tag('button', '<i class="bi bi-list" aria-hidden="true"></i>',
 ]);
 
 echo html_writer::tag('a', '<i class="bi bi-chevron-left" aria-hidden="true"></i>', [
-    'href'       => $prev_url->out(),
+    'href'       => $prevUrl->out(),
     'class'      => 'btn btn-sm btn-outline-secondary',
     'aria-label' => get_string('previousmonth', 'local_calendarcategories'),
 ]);
-echo html_writer::span($month_names[$month] . ' ' . $year, 'lcc-month-label fw-semibold');
+echo html_writer::span($monthNames[$month] . ' ' . $year, 'lcc-month-label fw-semibold');
 echo html_writer::tag('a', '<i class="bi bi-chevron-right" aria-hidden="true"></i>', [
-    'href'       => $next_url->out(),
+    'href'       => $nextUrl->out(),
     'class'      => 'btn btn-sm btn-outline-secondary',
     'aria-label' => get_string('nextmonth', 'local_calendarcategories'),
 ]);
 echo html_writer::tag('a', get_string('today', 'local_calendarcategories'), [
-    'href'  => $today_url->out(),
+    'href'  => $todayUrl->out(),
     'class' => 'btn btn-sm btn-outline-secondary',
 ]);
 echo html_writer::end_div(); // Toolbar-left.
@@ -158,13 +158,13 @@ foreach (['list' => 'viewlist', 'month' => 'viewmonth', 'week' => 'viewweek'] as
 }
 echo html_writer::end_tag('div');
 
-if ($can_add) {
+if ($canAdd) {
     echo html_writer::tag(
         'a',
         '<i class="bi bi-plus-lg" aria-hidden="true"></i> '
         . get_string('addevent', 'local_calendarcategories'),
         [
-            'href'  => $addevent_url->out(),
+            'href'  => $addeventUrl->out(),
             'class' => 'btn btn-sm btn-primary d-none d-md-inline-flex align-items-center gap-1',
         ]
     );
@@ -221,19 +221,19 @@ echo html_writer::end_tag('aside');
 // Main content.
 echo html_writer::start_tag('main', ['class' => 'lcc-main', 'id' => 'lcc-main']);
 if ($view === 'month') {
-    echo renderer::render_month_view($year, $month, $ev_by_date, $can_add, $addevent_url);
+    echo renderer::render_month_view($year, $month, $evByDate, $canAdd, $addeventUrl);
 } else if ($view === 'week') {
-    echo renderer::render_week_view($year, $month, $month_events, $can_add, $addevent_url);
+    echo renderer::render_week_view($year, $month, $monthEvents, $canAdd, $addeventUrl);
 } else {
-    echo renderer::render_list_view($upcoming, $can_add, $addevent_url);
+    echo renderer::render_list_view($upcoming, $canAdd, $addeventUrl);
 }
 echo html_writer::end_tag('main');
 echo html_writer::end_div(); // Body.
 
 // FAB (mobile).
-if ($can_add) {
+if ($canAdd) {
     echo html_writer::tag('a', '<i class="bi bi-plus-lg" aria-hidden="true"></i>', [
-        'href'       => $addevent_url->out(),
+        'href'       => $addeventUrl->out(),
         'class'      => 'lcc-fab d-md-none',
         'aria-label' => get_string('addevent', 'local_calendarcategories'),
     ]);
@@ -245,12 +245,12 @@ echo html_writer::start_tag('nav', [
     'aria-label' => get_string('calendarview', 'local_calendarcategories'),
 ]);
 echo html_writer::start_div('lcc-mobile-nav-inner');
-$mobile_nav = [
+$mobileNav = [
     'list'  => ['bi-list-ul', 'viewlist'],
     'month' => ['bi-calendar3', 'viewmonth'],
     'week'  => ['bi-calendar-week', 'viewweek'],
 ];
-foreach ($mobile_nav as $v => [$icon, $strkey]) {
+foreach ($mobileNav as $v => [$icon, $strkey]) {
     $url = (new moodle_url(
         '/local/calendarcategories/view.php',
         ['view' => $v, 'year' => $year, 'month' => $month]

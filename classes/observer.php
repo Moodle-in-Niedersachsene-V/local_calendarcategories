@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - https://moodle.org/.
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,8 +15,6 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 namespace local_calendarcategories;
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Event observers for local_calendarcategories.

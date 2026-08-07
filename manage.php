@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - https://moodle.org/.
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,9 +15,13 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Management page for calendar categories.
+ * Management page for calendar groups.
  *
  * Access: local/calendarcategories:manage in CONTEXT_SYSTEM.
+ *
+ * @package    local_calendarcategories
+ * @copyright  2026 Moodle in Niedersachsen e. V.
+ * @license    https://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3 or later
  */
 
 require_once(__DIR__ . '/../../config.php');
@@ -70,8 +74,8 @@ echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('managecategories', 'local_calendarcategories'));
 
 // "Add" button.
-$add_url = new moodle_url('/local/calendarcategories/edit.php', ['action' => 'add']);
-echo $OUTPUT->single_button($add_url, get_string('addcategory', 'local_calendarcategories'), 'get');
+$addUrl = new moodle_url('/local/calendarcategories/edit.php', ['action' => 'add']);
+echo $OUTPUT->single_button($addUrl, get_string('addcategory', 'local_calendarcategories'), 'get');
 
 // List existing categories.
 global $DB;
@@ -87,17 +91,17 @@ if ($categories) {
     ];
 
     foreach ($categories as $cat) {
-        $edit_url   = new moodle_url('/local/calendarcategories/edit.php', ['id' => $cat->id]);
-        $delete_url = new moodle_url(
+        $editUrl   = new moodle_url('/local/calendarcategories/edit.php', ['id' => $cat->id]);
+        $deleteUrl = new moodle_url(
             '/local/calendarcategories/manage.php',
             ['action' => 'delete', 'id' => $cat->id, 'sesskey' => sesskey()]
         );
-        $toggle_url = new moodle_url(
+        $toggleUrl = new moodle_url(
             '/local/calendarcategories/manage.php',
             ['action' => 'togglevisible', 'id' => $cat->id, 'sesskey' => sesskey()]
         );
 
-        $color_box = html_writer::tag(
+        $colorBox = html_writer::tag(
             'span',
             '&nbsp;&nbsp;&nbsp;&nbsp;',
             ['style' => "background:{$cat->color};border:1px solid #999;display:inline-block;"]
@@ -105,14 +109,14 @@ if ($categories) {
 
         $table->data[] = [
             format_string($cat->name),
-            $color_box . ' ' . s($cat->color),
+            $colorBox . ' ' . s($cat->color),
             $cat->visible
                 ? $OUTPUT->pix_icon('i/show', get_string('visible'))
                 : $OUTPUT->pix_icon('i/hide', get_string('notvisible')),
-            html_writer::link($edit_url, get_string('edit')) . ' | ' .
-            html_writer::link($toggle_url, $cat->visible ? get_string('hide') : get_string('show')) . ' | ' .
+            html_writer::link($editUrl, get_string('edit')) . ' | ' .
+            html_writer::link($toggleUrl, $cat->visible ? get_string('hide') : get_string('show')) . ' | ' .
             html_writer::link(
-                $delete_url,
+                $deleteUrl,
                 get_string('delete'),
                 ['onclick' => 'return confirm(' . json_encode(get_string('confirmdelete', 'local_calendarcategories')) . ')']
             ),
