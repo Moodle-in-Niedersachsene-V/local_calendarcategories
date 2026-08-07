@@ -94,7 +94,7 @@ class local_calendarcategories_edit_form extends moodleform {
 // Process form.
 global $DB;
 
-$category = $id ? $DB->get_record('local_calcategories', ['id' => $id], '*', MUST_EXIST) : null;
+$category = $id ? $DB->get_record('local_calendarcategories_cats', ['id' => $id], '*', MUST_EXIST) : null;
 
 $form = new local_calendarcategories_edit_form();
 

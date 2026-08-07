@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/calendarcategories/db" VERSION="2026062836"
+<XMLDB PATH="local/calendarcategories/db" VERSION="2026062837"
        COMMENT="local_calendarcategories database schema"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
   <TABLES>
 
-    <TABLE NAME="local_calcategories" COMMENT="Custom calendar event categories">
+    <TABLE NAME="local_calendarcategories_cats" COMMENT="Custom calendar event categories">
       <FIELDS>
         <FIELD NAME="id"           TYPE="int"  LENGTH="10"  NOTNULL="true"  SEQUENCE="true"/>
         <FIELD NAME="name"         TYPE="char" LENGTH="255" NOTNULL="true"/>
@@ -28,7 +28,7 @@
       </INDEXES>
     </TABLE>
 
-    <TABLE NAME="local_calcategory_members" COMMENT="Members assigned to a calendar category">
+    <TABLE NAME="local_calendarcategories_members" COMMENT="Members assigned to a calendar category">
       <FIELDS>
         <FIELD NAME="id"          TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="categoryid"  TYPE="int" LENGTH="10" NOTNULL="true"/>
@@ -37,7 +37,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary"     TYPE="primary" FIELDS="id"/>
-        <KEY NAME="fk_category" TYPE="foreign" FIELDS="categoryid" REFTABLE="local_calcategories" REFFIELDS="id"/>
+        <KEY NAME="fk_category" TYPE="foreign" FIELDS="categoryid" REFTABLE="local_calendarcategories_cats" REFFIELDS="id"/>
         <KEY NAME="fk_user"     TYPE="foreign" FIELDS="userid"     REFTABLE="user"                REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
@@ -45,7 +45,7 @@
       </INDEXES>
     </TABLE>
 
-    <TABLE NAME="local_calcategory_events" COMMENT="Links calendar events to custom categories">
+    <TABLE NAME="local_calendarcategories_events" COMMENT="Links calendar events to custom categories">
       <FIELDS>
         <FIELD NAME="id"          TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="categoryid"  TYPE="int" LENGTH="10" NOTNULL="true"/>
@@ -54,7 +54,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary"     TYPE="primary" FIELDS="id"/>
-        <KEY NAME="fk_category" TYPE="foreign" FIELDS="categoryid" REFTABLE="local_calcategories" REFFIELDS="id"/>
+        <KEY NAME="fk_category" TYPE="foreign" FIELDS="categoryid" REFTABLE="local_calendarcategories_cats" REFFIELDS="id"/>
         <KEY NAME="fk_event"    TYPE="foreign" FIELDS="eventid"    REFTABLE="event"               REFFIELDS="id"/>
       </KEYS>
       <INDEXES>

@@ -27,8 +27,8 @@ use core_privacy\local\request\writer;
  * Privacy provider – GDPR compliance for local_calendarcategories.
  *
  * Personal data stored:
- *  - local_calcategory_members: userid → which categories a user belongs to.
- *  - local_calcategories.usermodified: tracks who last changed a category.
+ *  - local_calendarcategories_members: userid → which categories a user belongs to.
+ *  - local_calendarcategories_cats.usermodified: tracks who last changed a category.
  *
  * @package    local_calendarcategories
  * @copyright  2026 Moodle in Niedersachsen e. V.
@@ -47,21 +47,21 @@ class provider implements
     public static function get_metadata(collection $collection): collection {
 
         $collection->add_database_table(
-            'local_calcategory_members',
+            'local_calendarcategories_members',
             [
-                'userid'      => 'privacy:metadata:local_calcategory_members:userid',
-                'categoryid'  => 'privacy:metadata:local_calcategory_members:categoryid',
-                'timecreated' => 'privacy:metadata:local_calcategory_members:timecreated',
+                'userid'      => 'privacy:metadata:local_calendarcategories_members:userid',
+                'categoryid'  => 'privacy:metadata:local_calendarcategories_members:categoryid',
+                'timecreated' => 'privacy:metadata:local_calendarcategories_members:timecreated',
             ],
-            'privacy:metadata:local_calcategory_members'
+            'privacy:metadata:local_calendarcategories_members'
         );
 
         $collection->add_database_table(
-            'local_calcategories',
+            'local_calendarcategories_cats',
             [
-                'usermodified' => 'privacy:metadata:local_calcategories:usermodified',
+                'usermodified' => 'privacy:metadata:local_calendarcategories_cats:usermodified',
             ],
-            'privacy:metadata:local_calcategories'
+            'privacy:metadata:local_calendarcategories_cats'
         );
 
         return $collection;
@@ -80,15 +80,15 @@ class provider implements
         // Contexts of categories the user is a member of.
         $sql = 'SELECT DISTINCT c.id
                   FROM {context} c
-                  JOIN {local_calcategories} cat ON cat.contextid = c.id
-                  JOIN {local_calcategory_members} m ON m.categoryid = cat.id
+                  JOIN {local_calendarcategories_cats} cat ON cat.contextid = c.id
+                  JOIN {local_calendarcategories_members} m ON m.categoryid = cat.id
                  WHERE m.userid = :userid';
         $contextlist->add_from_sql($sql, ['userid' => $userid]);
 
         // Contexts of categories the user last modified.
         $sql2 = 'SELECT DISTINCT c.id
                    FROM {context} c
-                   JOIN {local_calcategories} cat ON cat.contextid = c.id
+                   JOIN {local_calendarcategories_cats} cat ON cat.contextid = c.id
                   WHERE cat.usermodified = :userid';
         $contextlist->add_from_sql($sql2, ['userid' => $userid]);
 
@@ -105,8 +105,8 @@ class provider implements
         $contextid = $userlist->get_context()->id;
 
         $sql = 'SELECT m.userid
-                  FROM {local_calcategory_members} m
-                  JOIN {local_calcategories} cat ON cat.id = m.categoryid
+                  FROM {local_calendarcategories_members} m
+                  JOIN {local_calendarcategories_cats} cat ON cat.id = m.categoryid
                  WHERE cat.contextid = :contextid';
         $userlist->add_from_sql('userid', $sql, ['contextid' => $contextid]);
     }
@@ -122,8 +122,8 @@ class provider implements
 
         foreach ($contextlist->get_contexts() as $context) {
             $sql = 'SELECT cat.name, m.timecreated
-                      FROM {local_calcategory_members} m
-                      JOIN {local_calcategories} cat ON cat.id = m.categoryid
+                      FROM {local_calendarcategories_members} m
+                      JOIN {local_calendarcategories_cats} cat ON cat.id = m.categoryid
                      WHERE m.userid = :userid AND cat.contextid = :contextid';
             $rows = $DB->get_records_sql($sql, ['userid' => $userid, 'contextid' => $context->id]);
             if ($rows) {
@@ -143,14 +143,14 @@ class provider implements
     public static function delete_data_for_all_users_in_context(\context $context): void {
         global $DB;
         $categoryids = $DB->get_fieldset_select(
-            'local_calcategories',
+            'local_calendarcategories_cats',
             'id',
             'contextid = :contextid',
             ['contextid' => $context->id]
         );
         if ($categoryids) {
             [$in, $params] = $DB->get_in_or_equal($categoryids, SQL_PARAMS_NAMED);
-            $DB->delete_records_select('local_calcategory_members', "categoryid $in", $params);
+            $DB->delete_records_select('local_calendarcategories_members', "categoryid $in", $params);
         }
     }
 
@@ -164,7 +164,7 @@ class provider implements
         $userid = (int)$contextlist->get_user()->id;
         foreach ($contextlist->get_contexts() as $context) {
             $categoryids = $DB->get_fieldset_select(
-                'local_calcategories',
+                'local_calendarcategories_cats',
                 'id',
                 'contextid = :contextid',
                 ['contextid' => $context->id]
@@ -173,7 +173,7 @@ class provider implements
                 [$in, $params] = $DB->get_in_or_equal($categoryids, SQL_PARAMS_NAMED);
                 $params['userid'] = $userid;
                 $DB->delete_records_select(
-                    'local_calcategory_members',
+                    'local_calendarcategories_members',
                     "categoryid $in AND userid = :userid",
                     $params
                 );
@@ -194,7 +194,7 @@ class provider implements
             return;
         }
         $categoryids = $DB->get_fieldset_select(
-            'local_calcategories',
+            'local_calendarcategories_cats',
             'id',
             'contextid = :contextid',
             ['contextid' => $contextid]
@@ -203,7 +203,7 @@ class provider implements
             [$incat, $catparams] = $DB->get_in_or_equal($categoryids, SQL_PARAMS_NAMED, 'cat');
             [$inusr, $usrparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'usr');
             $DB->delete_records_select(
-                'local_calcategory_members',
+                'local_calendarcategories_members',
                 "categoryid $incat AND userid $inusr",
                 array_merge($catparams, $usrparams)
             );

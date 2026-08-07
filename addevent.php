@@ -57,7 +57,7 @@ foreach ($mycats as $cat) {
 $existing = null;
 if ($eventid) {
     global $DB;
-    $link = $DB->get_record('local_calcategory_events', ['eventid' => $eventid]);
+    $link = $DB->get_record('local_calendarcategories_events', ['eventid' => $eventid]);
     if ($link) {
         $existing = $DB->get_record('event', ['id' => $eventid], '*', MUST_EXIST);
     }
@@ -158,7 +158,7 @@ $form = new local_calendarcategories_event_form(null, $formdata);
 // Pre-fill.
 if ($existing) {
     global $DB;
-    $link = $DB->get_record('local_calcategory_events', ['eventid' => $eventid]);
+    $link = $DB->get_record('local_calendarcategories_events', ['eventid' => $eventid]);
     $form->set_data([
         'eventid'      => $eventid,
         'name'         => $existing->name,

@@ -31,7 +31,7 @@ class observer {
      */
     public static function calendar_event_deleted(\core\event\calendar_event_deleted $event): void {
         global $DB;
-        $DB->delete_records('local_calcategory_events', ['eventid' => (int)$event->objectid]);
+        $DB->delete_records('local_calendarcategories_events', ['eventid' => (int)$event->objectid]);
     }
 
     /**
@@ -41,6 +41,6 @@ class observer {
      */
     public static function user_deleted(\core\event\user_deleted $event): void {
         global $DB;
-        $DB->delete_records('local_calcategory_members', ['userid' => (int)$event->objectid]);
+        $DB->delete_records('local_calendarcategories_members', ['userid' => (int)$event->objectid]);
     }
 }

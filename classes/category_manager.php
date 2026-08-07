@@ -68,7 +68,7 @@ class category_manager {
             'usermodified' => (int)$USER->id,
         ];
 
-        return $DB->insert_record('local_calcategories', $record);
+        return $DB->insert_record('local_calendarcategories_cats', $record);
     }
 
     /**
@@ -83,7 +83,7 @@ class category_manager {
     public static function update(int $id, array $data): bool {
         global $DB, $USER;
 
-        $category = $DB->get_record('local_calcategories', ['id' => $id], '*', MUST_EXIST);
+        $category = $DB->get_record('local_calendarcategories_cats', ['id' => $id], '*', MUST_EXIST);
         $context  = \context::instance_by_id($category->contextid, MUST_EXIST);
         require_capability('local/calendarcategories:manage', $context);
 
@@ -103,7 +103,7 @@ class category_manager {
             }
         }
 
-        return $DB->update_record('local_calcategories', $record);
+        return $DB->update_record('local_calendarcategories_cats', $record);
     }
 
     /**
@@ -116,13 +116,13 @@ class category_manager {
     public static function delete(int $id): bool {
         global $DB;
 
-        $category = $DB->get_record('local_calcategories', ['id' => $id], '*', MUST_EXIST);
+        $category = $DB->get_record('local_calendarcategories_cats', ['id' => $id], '*', MUST_EXIST);
         $context  = \context::instance_by_id($category->contextid, MUST_EXIST);
         require_capability('local/calendarcategories:manage', $context);
 
-        $DB->delete_records('local_calcategory_members', ['categoryid' => $id]);
-        $DB->delete_records('local_calcategory_events', ['categoryid' => $id]);
-        return $DB->delete_records('local_calcategories', ['id' => $id]);
+        $DB->delete_records('local_calendarcategories_members', ['categoryid' => $id]);
+        $DB->delete_records('local_calendarcategories_events', ['categoryid' => $id]);
+        return $DB->delete_records('local_calendarcategories_cats', ['id' => $id]);
     }
 
     /**
@@ -136,7 +136,7 @@ class category_manager {
     public static function add_member(int $categoryid, int $userid): bool {
         global $DB;
 
-        $category = $DB->get_record('local_calcategories', ['id' => $categoryid], '*', MUST_EXIST);
+        $category = $DB->get_record('local_calendarcategories_cats', ['id' => $categoryid], '*', MUST_EXIST);
         $context  = \context::instance_by_id($category->contextid, MUST_EXIST);
         require_capability('local/calendarcategories:manage', $context);
 
@@ -145,11 +145,11 @@ class category_manager {
             throw new \moodle_exception('invaliduser', 'local_calendarcategories');
         }
 
-        if ($DB->record_exists('local_calcategory_members', ['categoryid' => $categoryid, 'userid' => $userid])) {
+        if ($DB->record_exists('local_calendarcategories_members', ['categoryid' => $categoryid, 'userid' => $userid])) {
             return false;
         }
 
-        $DB->insert_record('local_calcategory_members', [
+        $DB->insert_record('local_calendarcategories_members', [
             'categoryid'  => $categoryid,
             'userid'      => $userid,
             'timecreated' => time(),
@@ -168,12 +168,12 @@ class category_manager {
     public static function remove_member(int $categoryid, int $userid): bool {
         global $DB;
 
-        $category = $DB->get_record('local_calcategories', ['id' => $categoryid], '*', MUST_EXIST);
+        $category = $DB->get_record('local_calendarcategories_cats', ['id' => $categoryid], '*', MUST_EXIST);
         $context  = \context::instance_by_id($category->contextid, MUST_EXIST);
         require_capability('local/calendarcategories:manage', $context);
 
         return (bool)$DB->delete_records(
-            'local_calcategory_members',
+            'local_calendarcategories_members',
             ['categoryid' => $categoryid, 'userid' => $userid]
         );
     }
@@ -189,7 +189,7 @@ class category_manager {
     public static function link_event(int $categoryid, int $eventid): bool {
         global $DB;
 
-        $category = $DB->get_record('local_calcategories', ['id' => $categoryid], '*', MUST_EXIST);
+        $category = $DB->get_record('local_calendarcategories_cats', ['id' => $categoryid], '*', MUST_EXIST);
         $context  = \context::instance_by_id($category->contextid, MUST_EXIST);
         require_capability('local/calendarcategories:addevent', $context);
 
@@ -198,11 +198,11 @@ class category_manager {
             throw new \moodle_exception('invalidevent', 'local_calendarcategories');
         }
 
-        if ($DB->record_exists('local_calcategory_events', ['categoryid' => $categoryid, 'eventid' => $eventid])) {
+        if ($DB->record_exists('local_calendarcategories_events', ['categoryid' => $categoryid, 'eventid' => $eventid])) {
             return false;
         }
 
-        $DB->insert_record('local_calcategory_events', [
+        $DB->insert_record('local_calendarcategories_events', [
             'categoryid'  => $categoryid,
             'eventid'     => $eventid,
             'timecreated' => time(),
@@ -213,14 +213,14 @@ class category_manager {
     /**
      * Get all categories visible to the current user.
      *
-     * @return array of stdClass records from local_calcategories.
+     * @return array of stdClass records from local_calendarcategories_cats.
      */
     public static function get_visible_categories(): array {
         global $DB, $USER;
 
         // Admins see all.
         if (is_siteadmin()) {
-            return $DB->get_records('local_calcategories', ['visible' => 1], 'sortorder ASC');
+            return $DB->get_records('local_calendarcategories_cats', ['visible' => 1], 'sortorder ASC');
         }
 
         // Check view capability.
@@ -230,8 +230,8 @@ class category_manager {
 
         // Users see categories where they are members.
         $sql = 'SELECT c.*
-                  FROM {local_calcategories} c
-                  JOIN {local_calcategory_members} m ON m.categoryid = c.id
+                  FROM {local_calendarcategories_cats} c
+                  JOIN {local_calendarcategories_members} m ON m.categoryid = c.id
                  WHERE c.visible = 1
                    AND m.userid  = :userid
               ORDER BY c.sortorder ASC';
@@ -249,20 +249,20 @@ class category_manager {
     public static function get_category_events(int $categoryid): array {
         global $DB, $USER;
 
-        $category = $DB->get_record('local_calcategories', ['id' => $categoryid], '*', MUST_EXIST);
+        $category = $DB->get_record('local_calendarcategories_cats', ['id' => $categoryid], '*', MUST_EXIST);
         $context  = \context::instance_by_id($category->contextid, MUST_EXIST);
         require_capability('local/calendarcategories:view', $context);
 
         // Non-admins must be a member.
         if (!is_siteadmin()) {
-            if (!$DB->record_exists('local_calcategory_members', ['categoryid' => $categoryid, 'userid' => (int)$USER->id])) {
+            if (!$DB->record_exists('local_calendarcategories_members', ['categoryid' => $categoryid, 'userid' => (int)$USER->id])) {
                 throw new \required_capability_exception($context, 'local/calendarcategories:view', 'nopermissions', '');
             }
         }
 
         $sql = 'SELECT e.*
                   FROM {event} e
-                  JOIN {local_calcategory_events} ce ON ce.eventid = e.id
+                  JOIN {local_calendarcategories_events} ce ON ce.eventid = e.id
                  WHERE ce.categoryid = :categoryid
               ORDER BY e.timestart ASC';
 

@@ -26,7 +26,7 @@ require_once($CFG->dirroot . '/calendar/lib.php');
  *
  * Events are stored as mdl_event records (type = CALENDAR_EVENT_TYPE_STANDARD,
  * eventtype = 'site') and immediately linked to the chosen category via
- * local_calcategory_events.  This keeps them compatible with the Moodle
+ * local_calendarcategories_events.  This keeps them compatible with the Moodle
  * calendar API while letting the plugin control visibility through category
  * membership.
  *
@@ -38,7 +38,7 @@ class event_manager {
     /**
      * Create a new event and link it to a category.
      *
-     * @param  int    $categoryid   local_calcategories.id
+     * @param  int    $categoryid   local_calendarcategories_cats.id
      * @param  string $name         Event title.
      * @param  int    $timestart    Unix timestamp (start).
      * @param  int    $timeduration Duration in seconds (0 = no duration).
@@ -59,7 +59,7 @@ class event_manager {
         global $DB, $USER;
 
         // Capability check delegated to category_manager (also checks membership context).
-        $cat     = $DB->get_record('local_calcategories', ['id' => $categoryid], '*', MUST_EXIST);
+        $cat     = $DB->get_record('local_calendarcategories_cats', ['id' => $categoryid], '*', MUST_EXIST);
         $context = \context::instance_by_id($cat->contextid, MUST_EXIST);
         require_capability('local/calendarcategories:addevent', $context);
 
@@ -94,7 +94,7 @@ class event_manager {
         $eventid = (int)$event->id;
 
         // Link to category.
-        $DB->insert_record('local_calcategory_events', [
+        $DB->insert_record('local_calendarcategories_events', [
             'categoryid'  => $categoryid,
             'eventid'     => $eventid,
             'timecreated' => time(),
@@ -115,8 +115,8 @@ class event_manager {
         global $DB;
 
         // Load event + resolve category context for capability check.
-        $link = $DB->get_record('local_calcategory_events', ['eventid' => $eventid], '*', MUST_EXIST);
-        $cat  = $DB->get_record('local_calcategories', ['id' => $link->categoryid], '*', MUST_EXIST);
+        $link = $DB->get_record('local_calendarcategories_events', ['eventid' => $eventid], '*', MUST_EXIST);
+        $cat  = $DB->get_record('local_calendarcategories_cats', ['id' => $link->categoryid], '*', MUST_EXIST);
         $context = \context::instance_by_id($cat->contextid, MUST_EXIST);
         require_capability('local/calendarcategories:addevent', $context);
 
@@ -153,16 +153,16 @@ class event_manager {
     public static function delete_event(int $eventid): bool {
         global $DB;
 
-        $link = $DB->get_record('local_calcategory_events', ['eventid' => $eventid]);
+        $link = $DB->get_record('local_calendarcategories_events', ['eventid' => $eventid]);
         if (!$link) {
             return false;   // Not a plugin event – don't touch it.
         }
-        $cat     = $DB->get_record('local_calcategories', ['id' => $link->categoryid], '*', MUST_EXIST);
+        $cat     = $DB->get_record('local_calendarcategories_cats', ['id' => $link->categoryid], '*', MUST_EXIST);
         $context = \context::instance_by_id($cat->contextid, MUST_EXIST);
         require_capability('local/calendarcategories:addevent', $context);
 
         $calevent = \calendar_event::load($eventid);
-        $calevent->delete();   // Observer cleans up local_calcategory_events automatically.
+        $calevent->delete();   // Observer cleans up local_calendarcategories_events automatically.
 
         return true;
     }
@@ -184,8 +184,8 @@ class event_manager {
             // Admins see all.
             $sql = 'SELECT e.*, c.id AS categoryid, c.name AS categoryname, c.color AS categorycolor
                       FROM {event} e
-                      JOIN {local_calcategory_events} ce ON ce.eventid = e.id
-                      JOIN {local_calcategories} c ON c.id = ce.categoryid
+                      JOIN {local_calendarcategories_events} ce ON ce.eventid = e.id
+                      JOIN {local_calendarcategories_cats} c ON c.id = ce.categoryid
                      WHERE c.visible = 1
                        AND e.timestart >= :now
                        AND e.timestart < :end
@@ -197,9 +197,9 @@ class event_manager {
 
         $sql = 'SELECT e.*, c.id AS categoryid, c.name AS categoryname, c.color AS categorycolor
                   FROM {event} e
-                  JOIN {local_calcategory_events} ce ON ce.eventid = e.id
-                  JOIN {local_calcategories} c ON c.id = ce.categoryid
-                  JOIN {local_calcategory_members} m ON m.categoryid = c.id
+                  JOIN {local_calendarcategories_events} ce ON ce.eventid = e.id
+                  JOIN {local_calendarcategories_cats} c ON c.id = ce.categoryid
+                  JOIN {local_calendarcategories_members} m ON m.categoryid = c.id
                  WHERE c.visible = 1
                    AND m.userid  = :uid
                    AND e.timestart >= :now
@@ -229,8 +229,8 @@ class event_manager {
         if (is_siteadmin()) {
             $sql = 'SELECT e.*, c.id AS categoryid, c.name AS categoryname, c.color AS categorycolor
                       FROM {event} e
-                      JOIN {local_calcategory_events} ce ON ce.eventid = e.id
-                      JOIN {local_calcategories} c ON c.id = ce.categoryid
+                      JOIN {local_calendarcategories_events} ce ON ce.eventid = e.id
+                      JOIN {local_calendarcategories_cats} c ON c.id = ce.categoryid
                      WHERE c.visible = 1
                        AND e.timestart >= :s AND e.timestart < :en
                   ORDER BY e.timestart ASC';
@@ -241,9 +241,9 @@ class event_manager {
 
         $sql = 'SELECT e.*, c.id AS categoryid, c.name AS categoryname, c.color AS categorycolor
                   FROM {event} e
-                  JOIN {local_calcategory_events} ce ON ce.eventid = e.id
-                  JOIN {local_calcategories} c ON c.id = ce.categoryid
-                  JOIN {local_calcategory_members} m ON m.categoryid = c.id
+                  JOIN {local_calendarcategories_events} ce ON ce.eventid = e.id
+                  JOIN {local_calendarcategories_cats} c ON c.id = ce.categoryid
+                  JOIN {local_calendarcategories_members} m ON m.categoryid = c.id
                  WHERE c.visible = 1
                    AND m.userid  = :uid
                    AND e.timestart >= :s AND e.timestart < :en

@@ -58,7 +58,7 @@ if (in_array($action, ['delete', 'togglevisible'])) {
 
     if ($action === 'togglevisible' && $categoryid) {
         global $DB;
-        $cat = $DB->get_record('local_calcategories', ['id' => $categoryid], 'id, visible', MUST_EXIST);
+        $cat = $DB->get_record('local_calendarcategories_cats', ['id' => $categoryid], 'id, visible', MUST_EXIST);
         \local_calendarcategories\category_manager::update($categoryid, ['visible' => (int)!$cat->visible]);
         redirect(new moodle_url('/local/calendarcategories/manage.php'));
     }
@@ -73,7 +73,7 @@ echo $OUTPUT->single_button($addurl, get_string('addcategory', 'local_calendarca
 
 // List existing categories.
 global $DB;
-$categories = $DB->get_records('local_calcategories', null, 'sortorder ASC');
+$categories = $DB->get_records('local_calendarcategories_cats', null, 'sortorder ASC');
 
 if ($categories) {
     $table = new html_table();
