@@ -21,7 +21,7 @@
  *
  * @package    local_calendarcategories
  * @copyright  2026 Moodle in Niedersachsen e. V.
- * @license    https://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require_once(__DIR__ . '/../../config.php');
@@ -42,10 +42,7 @@ $PAGE->set_pagelayout('admin');
 
 // CSRF token for all write actions.
 // Sesskey wird nur bei Schreibaktionen geprüft (siehe unten).
-
-// ---------------------------------------------------------------------------
 // Handle write actions (require sesskey).
-// ---------------------------------------------------------------------------
 if (in_array($action, ['delete', 'togglevisible'])) {
     require_sesskey();
 
@@ -66,16 +63,13 @@ if (in_array($action, ['delete', 'togglevisible'])) {
         redirect(new moodle_url('/local/calendarcategories/manage.php'));
     }
 }
-
-// ---------------------------------------------------------------------------
 // Output.
-// ---------------------------------------------------------------------------
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('managecategories', 'local_calendarcategories'));
 
-// "Add" button.
-$addUrl = new moodle_url('/local/calendarcategories/edit.php', ['action' => 'add']);
-echo $OUTPUT->single_button($addUrl, get_string('addcategory', 'local_calendarcategories'), 'get');
+// Add button.
+$addurl = new moodle_url('/local/calendarcategories/edit.php', ['action' => 'add']);
+echo $OUTPUT->single_button($addurl, get_string('addcategory', 'local_calendarcategories'), 'get');
 
 // List existing categories.
 global $DB;
@@ -91,17 +85,17 @@ if ($categories) {
     ];
 
     foreach ($categories as $cat) {
-        $editUrl   = new moodle_url('/local/calendarcategories/edit.php', ['id' => $cat->id]);
-        $deleteUrl = new moodle_url(
+        $editurl   = new moodle_url('/local/calendarcategories/edit.php', ['id' => $cat->id]);
+        $deleteurl = new moodle_url(
             '/local/calendarcategories/manage.php',
             ['action' => 'delete', 'id' => $cat->id, 'sesskey' => sesskey()]
         );
-        $toggleUrl = new moodle_url(
+        $toggleurl = new moodle_url(
             '/local/calendarcategories/manage.php',
             ['action' => 'togglevisible', 'id' => $cat->id, 'sesskey' => sesskey()]
         );
 
-        $colorBox = html_writer::tag(
+        $colorbox = html_writer::tag(
             'span',
             '&nbsp;&nbsp;&nbsp;&nbsp;',
             ['style' => "background:{$cat->color};border:1px solid #999;display:inline-block;"]
@@ -109,14 +103,14 @@ if ($categories) {
 
         $table->data[] = [
             format_string($cat->name),
-            $colorBox . ' ' . s($cat->color),
+            $colorbox . ' ' . s($cat->color),
             $cat->visible
                 ? $OUTPUT->pix_icon('i/show', get_string('visible'))
                 : $OUTPUT->pix_icon('i/hide', get_string('notvisible')),
-            html_writer::link($editUrl, get_string('edit')) . ' | ' .
-            html_writer::link($toggleUrl, $cat->visible ? get_string('hide') : get_string('show')) . ' | ' .
+            html_writer::link($editurl, get_string('edit')) . ' | ' .
+            html_writer::link($toggleurl, $cat->visible ? get_string('hide') : get_string('show')) . ' | ' .
             html_writer::link(
-                $deleteUrl,
+                $deleteurl,
                 get_string('delete'),
                 ['onclick' => 'return confirm(' . json_encode(get_string('confirmdelete', 'local_calendarcategories')) . ')']
             ),

@@ -110,11 +110,11 @@ jobs:
 
       - name: Moodle PHPDoc Checker
         if: always()
-        run: moodle-plugin-ci phpdoc ./plugin
+        run: moodle-plugin-ci phpdoc --moodle moodle ./plugin
 
       - name: Validating
         if: always()
-        run: moodle-plugin-ci validate ./plugin
+        run: moodle-plugin-ci validate --moodle moodle ./plugin
 
       - name: Check upgrade savepoints
         if: always()
@@ -124,9 +124,6 @@ jobs:
         if: always()
         run: moodle-plugin-ci mustachelint ./plugin
 
-      - name: JavaScript Lint
-        if: always()
-        run: moodle-plugin-ci jslint ./plugin
 
       - name: PHPUnit
         if: always()

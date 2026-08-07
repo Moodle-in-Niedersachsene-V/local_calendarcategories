@@ -22,7 +22,7 @@ namespace local_calendarcategories\hook;
  *
  * @package    local_calendarcategories
  * @copyright  2026 Moodle in Niedersachsen e. V.
- * @license    https://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class after_config {
     /**

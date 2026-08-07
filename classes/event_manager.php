@@ -16,6 +16,8 @@
 
 namespace local_calendarcategories;
 
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once($CFG->dirroot . '/calendar/lib.php');
 
@@ -30,7 +32,7 @@ require_once($CFG->dirroot . '/calendar/lib.php');
  *
  * @package    local_calendarcategories
  * @copyright  2026 Moodle in Niedersachsen e. V.
- * @license    https://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class event_manager {
     /**
@@ -70,7 +72,7 @@ class event_manager {
         }
 
         // Build the Moodle calendar event record.
-        $eventData = (object)[
+        $eventdata = (object)[
             'name'           => clean_param($name, PARAM_TEXT),
             'description'    => clean_param($description, PARAM_CLEANHTML),
             'format'         => FORMAT_HTML,
@@ -88,7 +90,7 @@ class event_manager {
         ];
 
         // Use Moodle's calendar API so hooks/observers fire correctly.
-        $event   = \calendar_event::create($eventData, false);
+        $event   = \calendar_event::create($eventdata, false);
         $eventid = (int)$event->id;
 
         // Link to category.
@@ -118,7 +120,7 @@ class event_manager {
         $context = \context::instance_by_id($cat->contextid, MUST_EXIST);
         require_capability('local/calendarcategories:addevent', $context);
 
-        $calEvent = \calendar_event::load($eventid);
+        $calevent = \calendar_event::load($eventid);
 
         $update = new \stdClass();
         if (isset($data['name'])) {
@@ -137,7 +139,7 @@ class event_manager {
             $update->location = clean_param($data['location'], PARAM_TEXT);
         }
 
-        $calEvent->update($update, false);
+        $calevent->update($update, false);
         return true;
     }
 
@@ -159,8 +161,8 @@ class event_manager {
         $context = \context::instance_by_id($cat->contextid, MUST_EXIST);
         require_capability('local/calendarcategories:addevent', $context);
 
-        $calEvent = \calendar_event::load($eventid);
-        $calEvent->delete();   // Observer cleans up local_calcategory_events automatically.
+        $calevent = \calendar_event::load($eventid);
+        $calevent->delete();   // Observer cleans up local_calcategory_events automatically.
 
         return true;
     }

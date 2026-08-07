@@ -28,16 +28,13 @@ $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/local/calendarcategories/edit.php', ['id' => $id]));
 $PAGE->set_title(get_string('pluginname', 'local_calendarcategories'));
 $PAGE->set_pagelayout('admin');
-
-// ---------------------------------------------------------------------------
 // Inline form definition.
-// ---------------------------------------------------------------------------
 /**
  * Form for creating or editing a calendar group.
  *
  * @package    local_calendarcategories
  * @copyright  2026 Moodle in Niedersachsen e. V.
- * @license    https://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class local_calendarcategories_edit_form extends moodleform {
     /**
@@ -65,7 +62,7 @@ class local_calendarcategories_edit_form extends moodleform {
             get_string('color', 'local_calendarcategories'),
             ['size' => 7, 'maxlength' => 7]
         );
-        $mform->setType('color', PARAM_RAW);  // validated server-side in manager.
+        $mform->setType('color', PARAM_RAW);  // Validated server-side in manager.
         $mform->setDefault('color', '#3a87ad');
         $mform->addHelpButton('color', 'color', 'local_calendarcategories');
 
@@ -94,10 +91,7 @@ class local_calendarcategories_edit_form extends moodleform {
         return $errors;
     }
 }
-
-// ---------------------------------------------------------------------------
 // Process form.
-// ---------------------------------------------------------------------------
 global $DB;
 
 $category = $id ? $DB->get_record('local_calcategories', ['id' => $id], '*', MUST_EXIST) : null;
@@ -131,10 +125,7 @@ if ($form->is_cancelled()) {
         \core\output\notification::NOTIFY_SUCCESS
     );
 }
-
-// ---------------------------------------------------------------------------
 // Output.
-// ---------------------------------------------------------------------------
 echo $OUTPUT->header();
 $heading = $id
     ? get_string('editcategory', 'local_calendarcategories')

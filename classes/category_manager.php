@@ -24,7 +24,7 @@ namespace local_calendarcategories;
  *
  * @package    local_calendarcategories
  * @copyright  2026 Moodle in Niedersachsen e. V.
- * @license    https://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class category_manager {
     /**
@@ -32,7 +32,7 @@ class category_manager {
      *
      * @param  string $name        Human-readable name.
      * @param  string $color       Hex color, e.g. '#3a87ad'.
-     * @param  int    $contextId   Moodle context id (system, coursecat, …).
+     * @param  int    $contextid   Moodle context id (system, coursecat, …).
      * @param  string $description Optional description.
      * @param  int    $sortorder   Sort position.
      * @return int    New category id.
@@ -41,15 +41,15 @@ class category_manager {
     public static function create(
         string $name,
         string $color = '#3a87ad',
-        int $contextId = 0,
+        int $contextid = 0,
         string $description = '',
         int $sortorder = 0
     ): int {
         global $DB, $USER;
 
         // Capability check.
-        $context = $contextId
-            ? \context::instance_by_id($contextId, MUST_EXIST)
+        $context = $contextid
+            ? \context::instance_by_id($contextid, MUST_EXIST)
             : \context_system::instance();
         require_capability('local/calendarcategories:manage', $context);
 
@@ -268,11 +268,7 @@ class category_manager {
 
         return $DB->get_records_sql($sql, ['categoryid' => $categoryid]);
     }
-
-    // -----------------------------------------------------------------------
     // Internal helpers.
-    // -----------------------------------------------------------------------
-
     /**
      * Validate hex color string.
      *

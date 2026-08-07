@@ -23,7 +23,7 @@
  *
  * @package    local_calendarcategories
  * @copyright  2026 Moodle in Niedersachsen e. V.
- * @license    https://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require_once(__DIR__ . '/../../config.php');
@@ -63,37 +63,37 @@ $PAGE->requires->css(new moodle_url(
 
 // Data.
 $categories   = category_manager::get_visible_categories();
-$monthEvents = event_manager::get_month_events($year, $month);
+$monthevents = event_manager::get_month_events($year, $month);
 $upcoming     = ($view === 'list') ? event_manager::get_upcoming_for_user(180) : [];
 
 // Group month events by date string for quick lookup.
-$evByDate = [];
-foreach ($monthEvents as $ev) {
+$evbydate = [];
+foreach ($monthevents as $ev) {
     $d = date('Y-m-d', $ev->timestart);
-    $evByDate[$d][] = $ev;
+    $evbydate[$d][] = $ev;
 }
 
 // Navigation URLs.
-$prevMonth    = $month === 1 ? 12 : $month - 1;
-$prevYear     = $month === 1 ? $year - 1 : $year;
-$nextMonth    = $month === 12 ? 1 : $month + 1;
-$nextYear     = $month === 12 ? $year + 1 : $year;
-$prevUrl      = new moodle_url(
+$prevmonth    = $month === 1 ? 12 : $month - 1;
+$prevyear     = $month === 1 ? $year - 1 : $year;
+$nextmonth    = $month === 12 ? 1 : $month + 1;
+$nextyear     = $month === 12 ? $year + 1 : $year;
+$prevurl      = new moodle_url(
     '/local/calendarcategories/view.php',
-    ['view' => $view, 'year' => $prevYear, 'month' => $prevMonth]
+    ['view' => $view, 'year' => $prevyear, 'month' => $prevmonth]
 );
-$nextUrl      = new moodle_url(
+$nexturl      = new moodle_url(
     '/local/calendarcategories/view.php',
-    ['view' => $view, 'year' => $nextYear, 'month' => $nextMonth]
+    ['view' => $view, 'year' => $nextyear, 'month' => $nextmonth]
 );
-$todayUrl     = new moodle_url(
+$todayurl     = new moodle_url(
     '/local/calendarcategories/view.php',
     ['view' => $view, 'year' => date('Y'), 'month' => date('n')]
 );
-$addeventUrl  = new moodle_url('/local/calendarcategories/addevent.php');
+$addeventurl  = new moodle_url('/local/calendarcategories/addevent.php');
 
 // Month label.
-$monthNames = [
+$monthnames = [
     1  => get_string('month_jan', 'local_calendarcategories'),
     2  => get_string('month_feb', 'local_calendarcategories'),
     3  => get_string('month_mar', 'local_calendarcategories'),
@@ -108,7 +108,7 @@ $monthNames = [
     12 => get_string('month_dec', 'local_calendarcategories'),
 ];
 
-$canAdd = has_capability('local/calendarcategories:addevent', $context) && !empty($categories);
+$canadd = has_capability('local/calendarcategories:addevent', $context) && !empty($categories);
 
 echo $OUTPUT->header();
 
@@ -126,18 +126,18 @@ echo html_writer::tag('button', '<i class="bi bi-list" aria-hidden="true"></i>',
 ]);
 
 echo html_writer::tag('a', '<i class="bi bi-chevron-left" aria-hidden="true"></i>', [
-    'href'       => $prevUrl->out(),
+    'href'       => $prevurl->out(),
     'class'      => 'btn btn-sm btn-outline-secondary',
     'aria-label' => get_string('previousmonth', 'local_calendarcategories'),
 ]);
-echo html_writer::span($monthNames[$month] . ' ' . $year, 'lcc-month-label fw-semibold');
+echo html_writer::span($monthnames[$month] . ' ' . $year, 'lcc-month-label fw-semibold');
 echo html_writer::tag('a', '<i class="bi bi-chevron-right" aria-hidden="true"></i>', [
-    'href'       => $nextUrl->out(),
+    'href'       => $nexturl->out(),
     'class'      => 'btn btn-sm btn-outline-secondary',
     'aria-label' => get_string('nextmonth', 'local_calendarcategories'),
 ]);
 echo html_writer::tag('a', get_string('today', 'local_calendarcategories'), [
-    'href'  => $todayUrl->out(),
+    'href'  => $todayurl->out(),
     'class' => 'btn btn-sm btn-outline-secondary',
 ]);
 echo html_writer::end_div(); // Toolbar-left.
@@ -158,13 +158,13 @@ foreach (['list' => 'viewlist', 'month' => 'viewmonth', 'week' => 'viewweek'] as
 }
 echo html_writer::end_tag('div');
 
-if ($canAdd) {
+if ($canadd) {
     echo html_writer::tag(
         'a',
         '<i class="bi bi-plus-lg" aria-hidden="true"></i> '
         . get_string('addevent', 'local_calendarcategories'),
         [
-            'href'  => $addeventUrl->out(),
+            'href'  => $addeventurl->out(),
             'class' => 'btn btn-sm btn-primary d-none d-md-inline-flex align-items-center gap-1',
         ]
     );
@@ -221,19 +221,19 @@ echo html_writer::end_tag('aside');
 // Main content.
 echo html_writer::start_tag('main', ['class' => 'lcc-main', 'id' => 'lcc-main']);
 if ($view === 'month') {
-    echo renderer::render_month_view($year, $month, $evByDate, $canAdd, $addeventUrl);
+    echo renderer::render_month_view($year, $month, $evbydate, $canadd, $addeventurl);
 } else if ($view === 'week') {
-    echo renderer::render_week_view($year, $month, $monthEvents, $canAdd, $addeventUrl);
+    echo renderer::render_week_view($year, $month, $monthevents, $canadd, $addeventurl);
 } else {
-    echo renderer::render_list_view($upcoming, $canAdd, $addeventUrl);
+    echo renderer::render_list_view($upcoming, $canadd, $addeventurl);
 }
 echo html_writer::end_tag('main');
 echo html_writer::end_div(); // Body.
 
 // FAB (mobile).
-if ($canAdd) {
+if ($canadd) {
     echo html_writer::tag('a', '<i class="bi bi-plus-lg" aria-hidden="true"></i>', [
-        'href'       => $addeventUrl->out(),
+        'href'       => $addeventurl->out(),
         'class'      => 'lcc-fab d-md-none',
         'aria-label' => get_string('addevent', 'local_calendarcategories'),
     ]);
@@ -245,12 +245,12 @@ echo html_writer::start_tag('nav', [
     'aria-label' => get_string('calendarview', 'local_calendarcategories'),
 ]);
 echo html_writer::start_div('lcc-mobile-nav-inner');
-$mobileNav = [
+$mobilenav = [
     'list'  => ['bi-list-ul', 'viewlist'],
     'month' => ['bi-calendar3', 'viewmonth'],
     'week'  => ['bi-calendar-week', 'viewweek'],
 ];
-foreach ($mobileNav as $v => [$icon, $strkey]) {
+foreach ($mobilenav as $v => [$icon, $strkey]) {
     $url = (new moodle_url(
         '/local/calendarcategories/view.php',
         ['view' => $v, 'year' => $year, 'month' => $month]

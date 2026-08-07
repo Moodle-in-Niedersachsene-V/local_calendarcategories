@@ -19,13 +19,13 @@
  *
  * @package    local_calendarcategories
  * @copyright  2026 Moodle in Niedersachsen e. V.
- * @license    https://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_calendarcategories';
-$plugin->version = 2026062827;
+$plugin->version = 2026062832;
 $plugin->requires = 2025100600; // Moodle 5.1.
 $plugin->maturity = MATURITY_STABLE;
 $plugin->release = '1.1.0';

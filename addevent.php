@@ -15,18 +15,11 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Add / edit an event in a calendar category.
- *
- * Access: local/calendarcategories:addevent (CONTEXT_SYSTEM).
- * Pre-fill date via ?date=YYYY-MM-DD, edit existing via ?eventid=N.
- */
-
-/**
  * Add or edit a calendar group event.
  *
  * @package    local_calendarcategories
  * @copyright  2026 Moodle in Niedersachsen e. V.
- * @license    https://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require_once(__DIR__ . '/../../config.php');
@@ -37,14 +30,14 @@ $context = context_system::instance();
 require_capability('local/calendarcategories:addevent', $context);
 
 $eventid  = optional_param('eventid', 0, PARAM_INT);
-$prefdate = optional_param('date', '', PARAM_TEXT);   // YYYY-MM-DD
+$prefdate = optional_param('date', '', PARAM_TEXT);  // YYYY-MM-DD.
 
 $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/local/calendarcategories/addevent.php', ['eventid' => $eventid]));
 $PAGE->set_pagelayout('standard');
 $PAGE->requires->css('/local/calendarcategories/styles/calendarcategories.css');
 
-// ── Load categories the user can post into ──────────────────────────────────
+// Load categories the user can post into.
 $mycats = \local_calendarcategories\category_manager::get_visible_categories();
 if (empty($mycats)) {
     redirect(
@@ -60,7 +53,7 @@ foreach ($mycats as $cat) {
     $catoptions[$cat->id] = format_string($cat->name);
 }
 
-// ── Existing event (edit mode) ───────────────────────────────────────────────
+// Existing event (edit mode).
 $existing = null;
 if ($eventid) {
     global $DB;
@@ -75,13 +68,13 @@ $PAGE->set_title($existing
     : get_string('addevent', 'local_calendarcategories'));
 $PAGE->set_heading($PAGE->title);
 
-// ── Moodle form ─────────────────────────────────────────────────────────────
+// Moodle form.
 /**
  * Form for creating or editing a calendar group event.
  *
  * @package    local_calendarcategories
  * @copyright  2026 Moodle in Niedersachsen e. V.
- * @license    https://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class local_calendarcategories_event_form extends moodleform {
     /**
@@ -90,7 +83,7 @@ class local_calendarcategories_event_form extends moodleform {
     public function definition(): void {
         $mform   = $this->_form;
         $catopts = $this->_customdata['catoptions'];
-        $isEdit  = !empty($this->_customdata['eventid']);
+        $isedit  = !empty($this->_customdata['eventid']);
 
         // Title.
         $mform->addElement('text', 'name', get_string('eventtitle', 'local_calendarcategories'));
@@ -149,7 +142,7 @@ class local_calendarcategories_event_form extends moodleform {
         $mform->addElement('hidden', 'eventid');
         $mform->setType('eventid', PARAM_INT);
 
-        $this->add_action_buttons(true, $isEdit
+        $this->add_action_buttons(true, $isedit
             ? get_string('savechanges')
             : get_string('addevent', 'local_calendarcategories'));
     }
@@ -179,7 +172,7 @@ if ($existing) {
     $form->set_data(['timestart' => strtotime($prefdate . ' 09:00:00')]);
 }
 
-// ── Handle submission ────────────────────────────────────────────────────────
+// Handle submission.
 if ($form->is_cancelled()) {
     redirect(new moodle_url('/local/calendarcategories/view.php'));
 } else if ($data = $form->get_data()) {
@@ -205,7 +198,7 @@ if ($form->is_cancelled()) {
     );
 }
 
-// ── Output ───────────────────────────────────────────────────────────────────
+// Output.
 echo $OUTPUT->header();
 
 // Category color preview strip (JS-driven).
@@ -221,10 +214,10 @@ $catcolors = [];
 foreach ($mycats as $cat) {
     $catcolors[(int)$cat->id] = $cat->color;
 }
-$catcolorsJson = json_encode($catcolors);
+$catcolorsjson = json_encode($catcolors);
 echo html_writer::tag('script', "
 (function(){
-  var colors = {$catcolorsJson};
+  var colors = {$catcolorsjson};
   var sel = document.querySelector('[name=categoryid]');
   var bar = document.getElementById('lcc-cat-preview');
   if (!sel || !bar) return;

@@ -15,6 +15,14 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
+ * Plugin lib functions for local_calendarcategories.
+ *
+ * @package    local_calendarcategories
+ * @copyright  2026 Moodle in Niedersachsen e. V.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+/**
  * Global navigation: adds node to flat nav sidebar.
  * Visible for admins, managers, editingteachers.
  *
@@ -27,12 +35,12 @@ function local_calendarcategories_extend_navigation(global_navigation $nav): voi
     }
 
     try {
-        $sysContext = context_system::instance();
+        $syscontext = context_system::instance();
     } catch (\Exception $e) {
         return;
     }
 
-    if (!is_siteadmin() && !has_capability('local/calendarcategories:addevent', $sysContext)) {
+    if (!is_siteadmin() && !has_capability('local/calendarcategories:addevent', $syscontext)) {
         return;
     }
 

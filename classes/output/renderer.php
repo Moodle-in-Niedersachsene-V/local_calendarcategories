@@ -21,7 +21,7 @@ namespace local_calendarcategories\output;
  *
  * @package    local_calendarcategories
  * @copyright  2026 Moodle in Niedersachsen e. V.
- * @license    https://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class renderer {
     /**
@@ -55,19 +55,19 @@ class renderer {
      *
      * @param int        $year         Current year.
      * @param int        $month        Current month (1-12).
-     * @param array      $evByDate   Events keyed by date string YYYY-MM-DD.
-     * @param bool       $canAdd      Whether the user can create events.
-     * @param \moodle_url $addeventUrl URL to add-event page.
+     * @param array      $evbydate   Events keyed by date string YYYY-MM-DD.
+     * @param bool       $canadd      Whether the user can create events.
+     * @param \moodle_url $addeventurl URL to add-event page.
      * @return string HTML output.
      */
     public static function render_month_view(
         int $year,
         int $month,
-        array $evByDate,
-        bool $canAdd,
-        \moodle_url $addeventUrl
+        array $evbydate,
+        bool $canadd,
+        \moodle_url $addeventurl
     ): string {
-        $dayNames = [
+        $daynames = [
             get_string('day_mon', 'local_calendarcategories'),
             get_string('day_tue', 'local_calendarcategories'),
             get_string('day_wed', 'local_calendarcategories'),
@@ -78,7 +78,7 @@ class renderer {
         ];
 
         $out = html_writer::start_tag('div', ['class' => 'lcc-cal-header', 'role' => 'row']);
-        foreach ($dayNames as $d) {
+        foreach ($daynames as $d) {
             $out .= '<div role="columnheader" aria-label="' . s($d) . '">' . substr($d, 0, 2) . '</div>';
         }
         $out .= html_writer::end_tag('div');
@@ -89,25 +89,25 @@ class renderer {
         $today = date('Y-m-d');
 
         for ($cell = 0; $cell < 42; $cell++) {
-            $dayOffset    = $cell - $dow;
-            $cellDate     = date('Y-m-d', mktime(0, 0, 0, $month, 1 + $dayOffset, $year));
-            $dayNum       = (int)date('j', strtotime($cellDate));
-            $cellMonth    = (int)date('n', strtotime($cellDate));
-            $isThisMonth = ($cellMonth === $month);
-            $isToday      = ($cellDate === $today);
+            $dayoffset    = $cell - $dow;
+            $celldate     = date('Y-m-d', mktime(0, 0, 0, $month, 1 + $dayoffset, $year));
+            $daynum       = (int)date('j', strtotime($celldate));
+            $cellmonth    = (int)date('n', strtotime($celldate));
+            $isthismonth = ($cellmonth === $month);
+            $istoday      = ($celldate === $today);
 
             $classes = 'lcc-day'
-                . ($isThisMonth ? '' : ' other-month')
-                . ($isToday ? ' today' : '');
-            $numEl = \html_writer::div((string)$dayNum, 'lcc-day-num', ['aria-label' => $cellDate]);
+                . ($isthismonth ? '' : ' other-month')
+                . ($istoday ? ' today' : '');
+            $numel = \html_writer::div((string)$daynum, 'lcc-day-num', ['aria-label' => $celldate]);
 
-            $pillsHtml = '';
-            $dayEvents = $evByDate[$cellDate] ?? [];
+            $pillshtml = '';
+            $dayevents = $evbydate[$celldate] ?? [];
             $shown = 0;
-            foreach ($dayEvents as $ev) {
+            foreach ($dayevents as $ev) {
                 if ($shown >= 3) {
-                    $more = count($dayEvents) - 3;
-                    $pillsHtml .= \html_writer::div(
+                    $more = count($dayevents) - 3;
+                    $pillshtml .= \html_writer::div(
                         '+' . $more . ' ' . get_string('moreevents', 'local_calendarcategories'),
                         'lcc-more'
                     );
@@ -115,13 +115,13 @@ class renderer {
                 }
                 $color    = s($ev->categorycolor);
                 $time     = \html_writer::span(date('H:i', $ev->timestart), 'lcc-pill-time');
-                $pillUrl = new \moodle_url('/local/calendarcategories/view.php', ['event' => $ev->id]);
-                $pillsHtml .= \html_writer::tag(
+                $pillurl = new \moodle_url('/local/calendarcategories/view.php', ['event' => $ev->id]);
+                $pillshtml .= \html_writer::tag(
                     'a',
                     $time . ' ' . format_string($ev->name),
                     [
                         'class' => 'lcc-pill',
-                        'href'  => $pillUrl->out(),
+                        'href'  => $pillurl->out(),
                         'style' => "background:{$color}22;color:{$color};border-left:3px solid {$color}",
                         'title' => format_string($ev->name),
                     ]
@@ -129,15 +129,15 @@ class renderer {
                 $shown++;
             }
 
-            $cellLink = '';
-            if ($canAdd && $isThisMonth) {
-                $addUrl   = new \moodle_url('/local/calendarcategories/addevent.php', ['date' => $cellDate]);
-                $cellLink = ' data-addurl="' . $addUrl->out() . '"';
+            $celllink = '';
+            if ($canadd && $isthismonth) {
+                $addurl   = new \moodle_url('/local/calendarcategories/addevent.php', ['date' => $celldate]);
+                $celllink = ' data-addurl="' . $addurl->out() . '"';
             }
 
             $out .= '<div class="' . $classes . '" role="gridcell"'
-                . ' aria-label="' . $cellDate . '"' . $cellLink . '>'
-                . $numEl . $pillsHtml . '</div>';
+                . ' aria-label="' . $celldate . '"' . $celllink . '>'
+                . $numel . $pillshtml . '</div>';
         }
         $out .= '</div>';
         $js = 'document.querySelectorAll(".lcc-day[data-addurl]").forEach(function(cell){'
@@ -156,33 +156,33 @@ class renderer {
      * @param int        $year         Current year.
      * @param int        $month        Current month (1-12).
      * @param array      $events       Events for the month.
-     * @param bool       $canAdd      Whether the user can create events.
-     * @param \moodle_url $addeventUrl URL to add-event page.
+     * @param bool       $canadd      Whether the user can create events.
+     * @param \moodle_url $addeventurl URL to add-event page.
      * @return string HTML output.
      */
     public static function render_week_view(
         int $year,
         int $month,
         array $events,
-        bool $canAdd,
-        \moodle_url $addeventUrl
+        bool $canadd,
+        \moodle_url $addeventurl
     ): string {
-        $todayTs = mktime(0, 0, 0, (int)date('n'), (int)date('j'), (int)date('Y'));
-        $monthTs = mktime(0, 0, 0, $month, 1, $year);
-        $refTs   = (date('n', $todayTs) == $month && date('Y', $todayTs) == $year)
-            ? $todayTs
-            : $monthTs;
-        $dow    = (int)date('N', $refTs);
-        $monday = $refTs - ($dow - 1) * DAYSECS;
+        $todayts = mktime(0, 0, 0, (int)date('n'), (int)date('j'), (int)date('Y'));
+        $monthts = mktime(0, 0, 0, $month, 1, $year);
+        $refts   = (date('n', $todayts) == $month && date('Y', $todayts) == $year)
+            ? $todayts
+            : $monthts;
+        $dow    = (int)date('N', $refts);
+        $monday = $refts - ($dow - 1) * DAYSECS;
 
         $out  = html_writer::start_div('lcc-week-header') . html_writer::div('', '');
         for ($d = 0; $d < 7; $d++) {
             $ts       = $monday + $d * DAYSECS;
-            $isToday = date('Y-m-d', $ts) === date('Y-m-d');
-            $numCls  = 'lcc-day-num' . ($isToday ? ' bg-primary text-white rounded-circle' : '');
+            $istoday = date('Y-m-d', $ts) === date('Y-m-d');
+            $numcls  = 'lcc-day-num' . ($istoday ? ' bg-primary text-white rounded-circle' : '');
             $out .= html_writer::div(
                 html_writer::tag('span', date('D', $ts))
-                . html_writer::div((string)(int)date('j', $ts), $numCls, ['style' => 'margin:0 auto']),
+                . html_writer::div((string)(int)date('j', $ts), $numcls, ['style' => 'margin:0 auto']),
                 'lcc-week-header-day'
             );
         }
@@ -194,10 +194,10 @@ class renderer {
             $out .= html_writer::div(sprintf('%02d:00', $hour), 'lcc-hour-label');
             for ($d = 0; $d < 7; $d++) {
                 $ts          = $monday + $d * DAYSECS + $hour * 3600;
-                $tsEnd      = $ts + 3600;
-                $slotEvents = array_filter($events, fn($e) => $e->timestart >= $ts && $e->timestart < $tsEnd);
+                $tsend      = $ts + 3600;
+                $slotevents = array_filter($events, fn($e) => $e->timestart >= $ts && $e->timestart < $tsend);
                 $inner       = '';
-                foreach ($slotEvents as $ev) {
+                foreach ($slotevents as $ev) {
                     $color  = s($ev->categorycolor);
                     $inner .= \html_writer::tag(
                         'a',
@@ -225,21 +225,21 @@ class renderer {
      * Render the list view of upcoming events grouped by month.
      *
      * @param array      $events       Upcoming events.
-     * @param bool       $canAdd      Whether the user can create events.
-     * @param \moodle_url $addeventUrl URL to add-event page.
+     * @param bool       $canadd      Whether the user can create events.
+     * @param \moodle_url $addeventurl URL to add-event page.
      * @return string HTML output.
      */
     public static function render_list_view(
         array $events,
-        bool $canAdd,
-        \moodle_url $addeventUrl
+        bool $canadd,
+        \moodle_url $addeventurl
     ): string {
         if (empty($events)) {
-            $btn = $canAdd
+            $btn = $canadd
                 ? \html_writer::tag(
                     'a',
                     get_string('addevent', 'local_calendarcategories'),
-                    ['href' => $addeventUrl->out(), 'class' => 'btn btn-sm btn-primary']
+                    ['href' => $addeventurl->out(), 'class' => 'btn btn-sm btn-primary']
                 )
                 : '';
             return html_writer::div(
@@ -270,13 +270,13 @@ class renderer {
 
             $color   = s($ev->categorycolor);
             $dow     = get_string('day_' . strtolower(date('D', $ev->timestart)), 'local_calendarcategories');
-            $dayNum = date('j', $ev->timestart);
+            $daynum = date('j', $ev->timestart);
             $time    = date('H:i', $ev->timestart);
 
             $out .= \html_writer::tag(
                 'a',
                 '<div class="lcc-list-date">'
-                . '<div class="day">' . $dayNum . '</div>'
+                . '<div class="day">' . $daynum . '</div>'
                 . '<div class="dow">' . $dow . '</div></div>'
                 . '<div class="lcc-list-bar" style="background:' . $color . '"></div>'
                 . '<div class="lcc-list-info">'
