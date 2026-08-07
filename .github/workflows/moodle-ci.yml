@@ -43,9 +43,11 @@ jobs:
           - php: '8.3'
             moodle-branch: MOODLE_501_STABLE
             database: mariadb
+            db-type: mysqli
           - php: '8.4'
             moodle-branch: MOODLE_502_STABLE
             database: pgsql
+            db-type: pgsql
 
     steps:
       - name: Check out repository code
@@ -69,28 +71,14 @@ jobs:
 
       - name: Install Moodle (${{ matrix.moodle-branch }})
         run: |
-          DB=${{ matrix.database }}
-          if [ "$DB" = "mariadb" ]; then
-            moodle-plugin-ci install \
-              --plugin ./plugin \
-              --db-host=127.0.0.1 \
-              --db-user=moodle \
-              --db-pass=moodle \
-              --db-name=moodle \
-              --db-type=mysqli \
-              --moodle-branch=${{ matrix.moodle-branch }}
-          else
-            moodle-plugin-ci install \
-              --plugin ./plugin \
-              --db-host=127.0.0.1 \
-              --db-user=moodle \
-              --db-pass=moodle \
-              --db-name=moodle \
-              --db-type=pgsql \
-              --moodle-branch=${{ matrix.moodle-branch }}
-          fi
-        env:
-          DB: ${{ matrix.database }}
+          moodle-plugin-ci install \
+            --plugin ./plugin \
+            --db-host=127.0.0.1 \
+            --db-user=moodle \
+            --db-pass=moodle \
+            --db-name=moodle \
+            --db-type=${{ matrix.db-type }} \
+            --branch=${{ matrix.moodle-branch }}
 
       - name: PHP Lint
         if: always()
