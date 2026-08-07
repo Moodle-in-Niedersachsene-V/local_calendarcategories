@@ -42,11 +42,9 @@ jobs:
         include:
           - php: '8.3'
             moodle-branch: MOODLE_501_STABLE
-            database: mariadb
             db-type: mysqli
           - php: '8.4'
             moodle-branch: MOODLE_502_STABLE
-            database: pgsql
             db-type: pgsql
 
     steps:
@@ -78,7 +76,8 @@ jobs:
             --db-pass=moodle \
             --db-name=moodle \
             --db-type=${{ matrix.db-type }} \
-            --branch=${{ matrix.moodle-branch }}
+            --branch=${{ matrix.moodle-branch }} \
+            --no-init
 
       - name: PHP Lint
         if: always()
