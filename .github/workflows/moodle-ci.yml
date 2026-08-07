@@ -43,9 +43,11 @@ jobs:
           - php: '8.3'
             moodle-branch: MOODLE_501_STABLE
             db-type: mysqli
+            db-host: 127.0.0.1
           - php: '8.4'
             moodle-branch: MOODLE_502_STABLE
             db-type: pgsql
+            db-host: 127.0.0.1
 
     steps:
       - name: Check out repository code
@@ -71,13 +73,12 @@ jobs:
         run: |
           moodle-plugin-ci install \
             --plugin ./plugin \
-            --db-host=127.0.0.1 \
+            --db-host=${{ matrix.db-host }} \
             --db-user=moodle \
             --db-pass=moodle \
-            --db-name=moodle \
+            --db-name=moodletest \
             --db-type=${{ matrix.db-type }} \
-            --branch=${{ matrix.moodle-branch }} \
-            --no-init
+            --branch=${{ matrix.moodle-branch }}
 
       - name: PHP Lint
         if: always()
