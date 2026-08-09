@@ -221,9 +221,9 @@ echo html_writer::end_tag('aside');
 // Main content.
 echo html_writer::start_tag('main', ['class' => 'lcc-main', 'id' => 'lcc-main']);
 if ($view === 'month') {
-    echo renderer::render_month_view($year, $month, $evbydate, $canadd, $addeventurl);
+    echo renderer::render_month_view($year, $month, $evbydate, $canadd);
 } else if ($view === 'week') {
-    echo renderer::render_week_view($year, $month, $monthevents, $canadd, $addeventurl);
+    echo renderer::render_week_view($year, $month, $monthevents);
 } else {
     echo renderer::render_list_view($upcoming, $canadd, $addeventurl);
 }

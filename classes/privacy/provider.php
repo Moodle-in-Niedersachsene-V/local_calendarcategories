@@ -74,7 +74,6 @@ class provider implements
      * @return contextlist $contextlist The contextlist containing the list of contexts.
      */
     public static function get_contexts_for_userid(int $userid): contextlist {
-        global $DB;
         $contextlist = new contextlist();
 
         // Contexts of categories the user is a member of.
@@ -101,7 +100,6 @@ class provider implements
      * @param userlist $userlist The userlist containing the list of users who have data in this context/plugin combination.
      */
     public static function get_users_in_context(userlist $userlist): void {
-        global $DB;
         $contextid = $userlist->get_context()->id;
 
         $sql = 'SELECT m.userid

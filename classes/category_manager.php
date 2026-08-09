@@ -255,7 +255,11 @@ class category_manager {
 
         // Non-admins must be a member.
         if (!is_siteadmin()) {
-            if (!$DB->record_exists('local_calendarcategories_members', ['categoryid' => $categoryid, 'userid' => (int)$USER->id])) {
+            $ismember = $DB->record_exists(
+                'local_calendarcategories_members',
+                ['categoryid' => $categoryid, 'userid' => (int)$USER->id]
+            );
+            if (!$ismember) {
                 throw new \required_capability_exception($context, 'local/calendarcategories:view', 'nopermissions', '');
             }
         }

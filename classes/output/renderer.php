@@ -53,19 +53,17 @@ class renderer {
     /**
      * Render the month calendar grid.
      *
-     * @param int        $year         Current year.
-     * @param int        $month        Current month (1-12).
-     * @param array      $evbydate   Events keyed by date string YYYY-MM-DD.
-     * @param bool       $canadd      Whether the user can create events.
-     * @param \moodle_url $addeventurl URL to add-event page.
+     * @param int   $year     Current year.
+     * @param int   $month    Current month (1-12).
+     * @param array $evbydate Events keyed by date string YYYY-MM-DD.
+     * @param bool  $canadd   Whether the user can create events.
      * @return string HTML output.
      */
     public static function render_month_view(
         int $year,
         int $month,
         array $evbydate,
-        bool $canadd,
-        \moodle_url $addeventurl
+        bool $canadd
     ): string {
         $daynames = [
             get_string('day_mon', 'local_calendarcategories'),
@@ -153,19 +151,15 @@ class renderer {
     /**
      * Render the week time-grid view.
      *
-     * @param int        $year         Current year.
-     * @param int        $month        Current month (1-12).
-     * @param array      $events       Events for the month.
-     * @param bool       $canadd      Whether the user can create events.
-     * @param \moodle_url $addeventurl URL to add-event page.
+     * @param int   $year   Current year.
+     * @param int   $month  Current month (1-12).
+     * @param array $events Events for the month.
      * @return string HTML output.
      */
     public static function render_week_view(
         int $year,
         int $month,
-        array $events,
-        bool $canadd,
-        \moodle_url $addeventurl
+        array $events
     ): string {
         $todayts = mktime(0, 0, 0, (int)date('n'), (int)date('j'), (int)date('Y'));
         $monthts = mktime(0, 0, 0, $month, 1, $year);
@@ -224,8 +218,8 @@ class renderer {
     /**
      * Render the list view of upcoming events grouped by month.
      *
-     * @param array      $events       Upcoming events.
-     * @param bool       $canadd      Whether the user can create events.
+     * @param array       $events      Upcoming events.
+     * @param bool        $canadd      Whether the user can create events.
      * @param \moodle_url $addeventurl URL to add-event page.
      * @return string HTML output.
      */
