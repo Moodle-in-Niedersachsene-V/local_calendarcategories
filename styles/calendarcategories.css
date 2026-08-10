@@ -341,6 +341,21 @@
     font-size: .9rem;
 }
 
+.lcc-list-empty-icon {
+    opacity: .35;
+    margin-bottom: .5rem;
+}
+
+.lcc-list-empty-icon img {
+    width: 2rem;
+    height: 2rem;
+}
+
+.lcc-chevron {
+    font-size: 1.1rem;
+    line-height: 1;
+}
+
 /* ── Mobile nav bar (bottom) ────────────────────────────────── */
 .lcc-mobile-nav {
     display: none;

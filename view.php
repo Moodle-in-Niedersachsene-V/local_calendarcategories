@@ -57,9 +57,6 @@ $PAGE->set_title(get_string('pluginname', 'local_calendarcategories'));
 $PAGE->set_heading(get_string('pluginname', 'local_calendarcategories'));
 $PAGE->set_pagelayout('standard');
 $PAGE->requires->css('/local/calendarcategories/styles/calendarcategories.css');
-$PAGE->requires->css(new moodle_url(
-    'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css'
-));
 
 // Data.
 $categories   = category_manager::get_visible_categories();
@@ -116,7 +113,7 @@ echo $OUTPUT->header();
 echo html_writer::start_div('lcc-toolbar');
 echo html_writer::start_div('lcc-toolbar-left');
 
-echo html_writer::tag('button', '<i class="bi bi-list" aria-hidden="true"></i>', [
+echo html_writer::tag('button', $OUTPUT->pix_icon('i/menu', get_string('showcategories', 'local_calendarcategories')), [
     'class'            => 'btn btn-sm btn-outline-secondary d-md-none',
     'type'             => 'button',
     'data-bs-toggle'   => 'offcanvas',
@@ -125,13 +122,13 @@ echo html_writer::tag('button', '<i class="bi bi-list" aria-hidden="true"></i>',
     'aria-label'       => get_string('showcategories', 'local_calendarcategories'),
 ]);
 
-echo html_writer::tag('a', '<i class="bi bi-chevron-left" aria-hidden="true"></i>', [
+echo html_writer::tag('a', html_writer::span('&lsaquo;', 'lcc-chevron', ['aria-hidden' => 'true']), [
     'href'       => $prevurl->out(),
     'class'      => 'btn btn-sm btn-outline-secondary',
     'aria-label' => get_string('previousmonth', 'local_calendarcategories'),
 ]);
 echo html_writer::span($monthnames[$month] . ' ' . $year, 'lcc-month-label fw-semibold');
-echo html_writer::tag('a', '<i class="bi bi-chevron-right" aria-hidden="true"></i>', [
+echo html_writer::tag('a', html_writer::span('&rsaquo;', 'lcc-chevron', ['aria-hidden' => 'true']), [
     'href'       => $nexturl->out(),
     'class'      => 'btn btn-sm btn-outline-secondary',
     'aria-label' => get_string('nextmonth', 'local_calendarcategories'),
@@ -161,7 +158,7 @@ echo html_writer::end_tag('div');
 if ($canadd) {
     echo html_writer::tag(
         'a',
-        '<i class="bi bi-plus-lg" aria-hidden="true"></i> '
+        $OUTPUT->pix_icon('t/add', '') . ' '
         . get_string('addevent', 'local_calendarcategories'),
         [
             'href'  => $addeventurl->out(),
@@ -225,14 +222,14 @@ if ($view === 'month') {
 } else if ($view === 'week') {
     echo renderer::render_week_view($year, $month, $monthevents);
 } else {
-    echo renderer::render_list_view($upcoming, $canadd, $addeventurl);
+    echo renderer::render_list_view($upcoming, $canadd, $addeventurl, $OUTPUT);
 }
 echo html_writer::end_tag('main');
 echo html_writer::end_div(); // Body.
 
 // FAB (mobile).
 if ($canadd) {
-    echo html_writer::tag('a', '<i class="bi bi-plus-lg" aria-hidden="true"></i>', [
+    echo html_writer::tag('a', $OUTPUT->pix_icon('t/add', get_string('addevent', 'local_calendarcategories')), [
         'href'       => $addeventurl->out(),
         'class'      => 'lcc-fab d-md-none',
         'aria-label' => get_string('addevent', 'local_calendarcategories'),
@@ -246,19 +243,18 @@ echo html_writer::start_tag('nav', [
 ]);
 echo html_writer::start_div('lcc-mobile-nav-inner');
 $mobilenav = [
-    'list'  => ['bi-list-ul', 'viewlist'],
-    'month' => ['bi-calendar3', 'viewmonth'],
-    'week'  => ['bi-calendar-week', 'viewweek'],
+    'list'  => 'viewlist',
+    'month' => 'viewmonth',
+    'week'  => 'viewweek',
 ];
-foreach ($mobilenav as $v => [$icon, $strkey]) {
+foreach ($mobilenav as $v => $strkey) {
     $url = (new moodle_url(
         '/local/calendarcategories/view.php',
         ['view' => $v, 'year' => $year, 'month' => $month]
     ))->out();
     echo html_writer::tag(
         'a',
-        '<i class="bi ' . $icon . '" aria-hidden="true"></i>'
-        . get_string($strkey, 'local_calendarcategories'),
+        $OUTPUT->pix_icon('i/calendar', '') . get_string($strkey, 'local_calendarcategories'),
         [
             'href'         => $url,
             'class'        => 'lcc-mobile-nav-btn' . ($view === $v ? ' active' : ''),

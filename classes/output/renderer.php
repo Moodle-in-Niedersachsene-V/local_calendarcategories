@@ -218,15 +218,17 @@ class renderer {
     /**
      * Render the list view of upcoming events grouped by month.
      *
-     * @param array       $events      Upcoming events.
-     * @param bool        $canadd      Whether the user can create events.
-     * @param \moodle_url $addeventurl URL to add-event page.
+     * @param array          $events      Upcoming events.
+     * @param bool           $canadd      Whether the user can create events.
+     * @param \moodle_url    $addeventurl URL to add-event page.
+     * @param \core_renderer $output      Page output renderer, for pix_icon().
      * @return string HTML output.
      */
     public static function render_list_view(
         array $events,
         bool $canadd,
-        \moodle_url $addeventurl
+        \moodle_url $addeventurl,
+        \core_renderer $output
     ): string {
         if (empty($events)) {
             $btn = $canadd
@@ -237,11 +239,7 @@ class renderer {
                 )
                 : '';
             return html_writer::div(
-                html_writer::tag('i', '', [
-                    'class'       => 'bi bi-calendar-x',
-                    'style'       => 'font-size:2rem;opacity:.3',
-                    'aria-hidden' => 'true',
-                ])
+                html_writer::div($output->pix_icon('i/calendar', ''), 'lcc-list-empty-icon')
                 . html_writer::tag('p', get_string('noupcoming', 'local_calendarcategories'))
                 . $btn,
                 'lcc-list-empty'
