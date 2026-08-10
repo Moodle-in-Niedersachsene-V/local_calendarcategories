@@ -61,7 +61,9 @@ class event_manager {
         // Capability check delegated to category_manager (also checks membership context).
         $cat     = $DB->get_record('local_calendarcategories_cats', ['id' => $categoryid], '*', MUST_EXIST);
         $context = \context::instance_by_id($cat->contextid, MUST_EXIST);
-        require_capability('local/calendarcategories:addevent', $context);
+        if (!util::has_capability_anywhere('local/calendarcategories:addevent')) {
+            throw new \required_capability_exception($context, 'local/calendarcategories:addevent', 'nopermissions', '');
+        }
 
         // Validate inputs.
         if (empty(trim($name))) {
@@ -118,7 +120,9 @@ class event_manager {
         $link = $DB->get_record('local_calendarcategories_events', ['eventid' => $eventid], '*', MUST_EXIST);
         $cat  = $DB->get_record('local_calendarcategories_cats', ['id' => $link->categoryid], '*', MUST_EXIST);
         $context = \context::instance_by_id($cat->contextid, MUST_EXIST);
-        require_capability('local/calendarcategories:addevent', $context);
+        if (!util::has_capability_anywhere('local/calendarcategories:addevent')) {
+            throw new \required_capability_exception($context, 'local/calendarcategories:addevent', 'nopermissions', '');
+        }
 
         $calevent = \calendar_event::load($eventid);
 
@@ -159,7 +163,9 @@ class event_manager {
         }
         $cat     = $DB->get_record('local_calendarcategories_cats', ['id' => $link->categoryid], '*', MUST_EXIST);
         $context = \context::instance_by_id($cat->contextid, MUST_EXIST);
-        require_capability('local/calendarcategories:addevent', $context);
+        if (!util::has_capability_anywhere('local/calendarcategories:addevent')) {
+            throw new \required_capability_exception($context, 'local/calendarcategories:addevent', 'nopermissions', '');
+        }
 
         $calevent = \calendar_event::load($eventid);
         $calevent->delete();   // Observer cleans up local_calendarcategories_events automatically.

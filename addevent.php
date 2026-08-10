@@ -27,7 +27,13 @@ require_once($CFG->libdir . '/formslib.php');
 
 require_login();
 $context = context_system::instance();
-require_capability('local/calendarcategories:addevent', $context);
+
+if (
+    !is_siteadmin()
+    && !\local_calendarcategories\util::has_capability_anywhere('local/calendarcategories:addevent')
+) {
+    throw new required_capability_exception($context, 'local/calendarcategories:addevent', 'nopermissions', '');
+}
 
 $eventid  = optional_param('eventid', 0, PARAM_INT);
 $prefdate = optional_param('date', '', PARAM_TEXT);  // YYYY-MM-DD.

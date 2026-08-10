@@ -34,13 +34,10 @@ function local_calendarcategories_extend_navigation(global_navigation $nav): voi
         return;
     }
 
-    try {
-        $syscontext = context_system::instance();
-    } catch (\Exception $e) {
-        return;
-    }
+    $canadd = is_siteadmin()
+        || \local_calendarcategories\util::has_capability_anywhere('local/calendarcategories:addevent');
 
-    if (!is_siteadmin() && !has_capability('local/calendarcategories:addevent', $syscontext)) {
+    if (!$canadd) {
         return;
     }
 

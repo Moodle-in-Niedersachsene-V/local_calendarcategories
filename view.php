@@ -31,6 +31,7 @@ require_once(__DIR__ . '/../../config.php');
 use local_calendarcategories\output\renderer;
 use local_calendarcategories\category_manager;
 use local_calendarcategories\event_manager;
+use local_calendarcategories\util;
 
 require_login();
 $context = context_system::instance();
@@ -106,7 +107,8 @@ $monthnames = [
     12 => get_string('month_dec', 'local_calendarcategories'),
 ];
 
-$canadd = has_capability('local/calendarcategories:addevent', $context) && !empty($categories);
+$canadd = (is_siteadmin() || util::has_capability_anywhere('local/calendarcategories:addevent'))
+    && !empty($categories);
 
 echo $OUTPUT->header();
 
