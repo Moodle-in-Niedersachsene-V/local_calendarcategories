@@ -35,6 +35,7 @@ class category_manager {
      * @param  int    $contextid   Moodle context id (system, coursecat, …).
      * @param  string $description Optional description.
      * @param  int    $sortorder   Sort position.
+     * @param  bool   $selfenrol   Whether users may join this category themselves.
      * @return int    New category id.
      * @throws \required_capability_exception
      */
@@ -43,7 +44,8 @@ class category_manager {
         string $color = '#3a87ad',
         int $contextid = 0,
         string $description = '',
-        int $sortorder = 0
+        int $sortorder = 0,
+        bool $selfenrol = false
     ): int {
         global $DB, $USER;
 
@@ -62,6 +64,7 @@ class category_manager {
             'color'        => $color,
             'contextid'    => $context->id,
             'sortorder'    => (int)$sortorder,
+            'selfenrol'    => (int)$selfenrol,
             'visible'      => 1,
             'timecreated'  => time(),
             'timemodified' => time(),
@@ -87,7 +90,7 @@ class category_manager {
         $context  = \context::instance_by_id($category->contextid, MUST_EXIST);
         require_capability('local/calendarcategories:manage', $context);
 
-        $allowed = ['name', 'description', 'color', 'sortorder', 'visible'];
+        $allowed = ['name', 'description', 'color', 'sortorder', 'selfenrol', 'visible'];
         $record  = (object)['id' => $id, 'timemodified' => time(), 'usermodified' => (int)$USER->id];
 
         foreach ($allowed as $field) {
@@ -95,11 +98,15 @@ class category_manager {
                 if ($field === 'color') {
                     self::validate_color($data[$field]);
                 }
-                $record->$field = $field === 'name'
-                    ? clean_param($data[$field], PARAM_TEXT)
-                    : ($field === 'description'
-                        ? clean_param($data[$field], PARAM_CLEANHTML)
-                        : $data[$field]);
+                if ($field === 'name') {
+                    $record->$field = clean_param($data[$field], PARAM_TEXT);
+                } else if ($field === 'description') {
+                    $record->$field = clean_param($data[$field], PARAM_CLEANHTML);
+                } else if ($field === 'selfenrol') {
+                    $record->$field = (int)(bool)$data[$field];
+                } else {
+                    $record->$field = $data[$field];
+                }
             }
         }
 
@@ -179,6 +186,68 @@ class category_manager {
     }
 
     /**
+     * Let the current user join a category that allows self-enrolment.
+     *
+     * @param  int  $categoryid
+     * @return bool  false if already a member.
+     * @throws \required_capability_exception
+     * @throws \moodle_exception if the category does not allow self-enrolment.
+     */
+    public static function self_join(int $categoryid): bool {
+        global $DB, $USER;
+
+        require_capability('local/calendarcategories:view', \context_system::instance());
+
+        $category = $DB->get_record('local_calendarcategories_cats', ['id' => $categoryid], '*', MUST_EXIST);
+        if (!$category->visible || !$category->selfenrol) {
+            throw new \moodle_exception('errorselfenrolnotallowed', 'local_calendarcategories');
+        }
+
+        if (
+            $DB->record_exists(
+                'local_calendarcategories_members',
+                ['categoryid' => $categoryid, 'userid' => (int)$USER->id]
+            )
+        ) {
+            return false;
+        }
+
+        $DB->insert_record('local_calendarcategories_members', [
+            'categoryid'  => $categoryid,
+            'userid'      => (int)$USER->id,
+            'timecreated' => time(),
+        ]);
+        return true;
+    }
+
+    /**
+     * Let the current user leave a category they joined themselves.
+     *
+     * Restricted to categories with selfenrol enabled: membership in
+     * admin-managed categories is removed by managers, not by the members.
+     *
+     * @param  int  $categoryid
+     * @return bool
+     * @throws \required_capability_exception
+     * @throws \moodle_exception if the category does not allow self-enrolment.
+     */
+    public static function self_leave(int $categoryid): bool {
+        global $DB, $USER;
+
+        require_capability('local/calendarcategories:view', \context_system::instance());
+
+        $category = $DB->get_record('local_calendarcategories_cats', ['id' => $categoryid], '*', MUST_EXIST);
+        if (!$category->selfenrol) {
+            throw new \moodle_exception('errorselfenrolnotallowed', 'local_calendarcategories');
+        }
+
+        return (bool)$DB->delete_records('local_calendarcategories_members', [
+            'categoryid' => $categoryid,
+            'userid'     => (int)$USER->id,
+        ]);
+    }
+
+    /**
      * Link a Moodle calendar event to a category.
      *
      * @param  int  $categoryid
@@ -234,6 +303,34 @@ class category_manager {
                   JOIN {local_calendarcategories_members} m ON m.categoryid = c.id
                  WHERE c.visible = 1
                    AND m.userid  = :userid
+              ORDER BY c.sortorder ASC';
+
+        return $DB->get_records_sql($sql, ['userid' => (int)$USER->id]);
+    }
+
+    /**
+     * Get categories the current user may join themselves but is not yet a
+     * member of.
+     *
+     * @return array of stdClass records from local_calendarcategories_cats.
+     */
+    public static function get_joinable_categories(): array {
+        global $DB, $USER;
+
+        if (!has_capability('local/calendarcategories:view', \context_system::instance())) {
+            return [];
+        }
+
+        $sql = 'SELECT c.*
+                  FROM {local_calendarcategories_cats} c
+                 WHERE c.visible = 1
+                   AND c.selfenrol = 1
+                   AND NOT EXISTS (
+                       SELECT 1
+                         FROM {local_calendarcategories_members} m
+                        WHERE m.categoryid = c.id
+                          AND m.userid = :userid
+                   )
               ORDER BY c.sortorder ASC';
 
         return $DB->get_records_sql($sql, ['userid' => (int)$USER->id]);

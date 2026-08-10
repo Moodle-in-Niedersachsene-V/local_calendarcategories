@@ -29,7 +29,10 @@ class renderer {
     /**
      * Render the category list for sidebar or off-canvas.
      *
-     * @param array $categories List of category records.
+     * Categories with selfenrol enabled get a small "leave" link so members
+     * who joined themselves can remove themselves again.
+     *
+     * @param array $categories List of category records the user belongs to.
      * @return string HTML output.
      */
     public static function render_cat_list(array $categories): string {
@@ -42,11 +45,63 @@ class renderer {
         }
         $out = '';
         foreach ($categories as $cat) {
-            $dot = html_writer::span('', 'lcc-cat-dot', ['style' => 'background:' . s($cat->color)]);
+            $dot  = html_writer::span('', 'lcc-cat-dot', ['style' => 'background:' . s($cat->color)]);
+            $name = html_writer::span(format_string($cat->name), 'lcc-cat-name');
+
+            $leave = '';
+            if (!empty($cat->selfenrol)) {
+                $leaveurl = new \moodle_url('/local/calendarcategories/join.php', [
+                    'action'     => 'leave',
+                    'categoryid' => $cat->id,
+                    'sesskey'    => sesskey(),
+                ]);
+                $leave = html_writer::link(
+                    $leaveurl,
+                    get_string('leavebutton', 'local_calendarcategories'),
+                    [
+                        'class'   => 'lcc-cat-leave',
+                        'onclick' => 'return confirm('
+                            . json_encode(get_string('confirmleave', 'local_calendarcategories')) . ')',
+                    ]
+                );
+            }
+
             $out .= html_writer::tag(
                 'div',
-                $dot . html_writer::span(format_string($cat->name)),
+                $dot . $name . $leave,
                 ['class' => 'lcc-cat-item active', 'title' => format_string($cat->name)]
+            );
+        }
+        return $out;
+    }
+
+    /**
+     * Render the list of categories the current user may join themselves.
+     *
+     * @param array $categories List of category records with selfenrol=1.
+     * @return string HTML output.
+     */
+    public static function render_joinable_list(array $categories): string {
+        $out = '';
+        foreach ($categories as $cat) {
+            $dot  = html_writer::span('', 'lcc-cat-dot', ['style' => 'background:' . s($cat->color)]);
+            $name = html_writer::span(format_string($cat->name), 'lcc-cat-name');
+
+            $joinurl = new \moodle_url('/local/calendarcategories/join.php', [
+                'action'     => 'join',
+                'categoryid' => $cat->id,
+                'sesskey'    => sesskey(),
+            ]);
+            $join = html_writer::link(
+                $joinurl,
+                get_string('joinbutton', 'local_calendarcategories'),
+                ['class' => 'lcc-cat-join']
+            );
+
+            $out .= html_writer::tag(
+                'div',
+                $dot . $name . $join,
+                ['class' => 'lcc-cat-item', 'title' => format_string($cat->name)]
             );
         }
         return $out;

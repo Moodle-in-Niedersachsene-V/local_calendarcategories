@@ -80,6 +80,7 @@ if ($categories) {
     $table->head = [
         get_string('categoryname', 'local_calendarcategories'),
         get_string('color', 'local_calendarcategories'),
+        get_string('selfenrol', 'local_calendarcategories'),
         get_string('visible'),
         get_string('actions'),
     ];
@@ -104,6 +105,9 @@ if ($categories) {
         $table->data[] = [
             format_string($cat->name),
             $colorbox . ' ' . s($cat->color),
+            !empty($cat->selfenrol)
+                ? $OUTPUT->pix_icon('i/valid', get_string('selfenrol', 'local_calendarcategories'))
+                : '–',
             $cat->visible
                 ? $OUTPUT->pix_icon('i/show', get_string('visible'))
                 : $OUTPUT->pix_icon('i/hide', get_string('notvisible')),

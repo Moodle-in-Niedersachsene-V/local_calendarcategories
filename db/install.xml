@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/calendarcategories/db" VERSION="2026062847"
+<XMLDB PATH="local/calendarcategories/db" VERSION="2026062850"
        COMMENT="local_calendarcategories database schema"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
@@ -13,6 +13,7 @@
         <FIELD NAME="color"        TYPE="char" LENGTH="7"   NOTNULL="true"  DEFAULT="#3a87ad" COMMENT="Hex color code for UI display"/>
         <FIELD NAME="contextid"    TYPE="int"  LENGTH="10"  NOTNULL="true"  DEFAULT="0" COMMENT="Moodle context this category belongs to"/>
         <FIELD NAME="sortorder"    TYPE="int"  LENGTH="10"  NOTNULL="true"  DEFAULT="0"/>
+        <FIELD NAME="selfenrol"    TYPE="int"  LENGTH="1"   NOTNULL="true"  DEFAULT="0" COMMENT="1 wenn Nutzer sich selbst zuordnen duerfen"/>
         <FIELD NAME="visible"      TYPE="int"  LENGTH="1"   NOTNULL="true"  DEFAULT="1"/>
         <FIELD NAME="timecreated"  TYPE="int"  LENGTH="10"  NOTNULL="true"  DEFAULT="0"/>
         <FIELD NAME="timemodified" TYPE="int"  LENGTH="10"  NOTNULL="true"  DEFAULT="0"/>

@@ -60,6 +60,7 @@ $PAGE->requires->css('/local/calendarcategories/styles/calendarcategories.css');
 
 // Data.
 $categories   = category_manager::get_visible_categories();
+$joinable     = category_manager::get_joinable_categories();
 $monthevents = event_manager::get_month_events($year, $month);
 $upcoming     = ($view === 'list') ? event_manager::get_upcoming_for_user(180) : [];
 
@@ -191,6 +192,12 @@ echo html_writer::tag('button', '', [
 echo html_writer::end_div();
 echo html_writer::start_div('offcanvas-body');
 echo renderer::render_cat_list($categories);
+if (!empty($joinable)) {
+    echo html_writer::start_div('lcc-sidebar-section mt-3');
+    echo html_writer::tag('h6', get_string('joinablecategories', 'local_calendarcategories'));
+    echo renderer::render_joinable_list($joinable);
+    echo html_writer::end_div();
+}
 echo html_writer::end_div();
 echo html_writer::end_tag('div');
 
@@ -206,6 +213,17 @@ echo html_writer::start_div('lcc-sidebar-section');
 echo html_writer::tag('h6', get_string('mycategories', 'local_calendarcategories'));
 echo renderer::render_cat_list($categories);
 echo html_writer::end_div();
+if (!empty($joinable)) {
+    echo html_writer::start_div('lcc-sidebar-section');
+    echo html_writer::tag('h6', get_string('joinablecategories', 'local_calendarcategories'));
+    echo renderer::render_joinable_list($joinable);
+    echo html_writer::tag(
+        'p',
+        get_string('joinablehint', 'local_calendarcategories'),
+        ['class' => 'small text-muted mb-0 mt-1']
+    );
+    echo html_writer::end_div();
+}
 echo html_writer::start_div('lcc-sidebar-section');
 echo html_writer::tag(
     'p',

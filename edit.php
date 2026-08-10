@@ -60,15 +60,34 @@ class local_calendarcategories_edit_form extends moodleform {
             'text',
             'color',
             get_string('color', 'local_calendarcategories'),
-            ['size' => 7, 'maxlength' => 7]
+            ['size' => 7, 'maxlength' => 7, 'id' => 'id_color']
         );
         $mform->setType('color', PARAM_RAW);  // Validated server-side in manager.
         $mform->setDefault('color', '#3a87ad');
         $mform->addHelpButton('color', 'color', 'local_calendarcategories');
 
+        $swatches = ['#3a87ad', '#0f6e56', '#993c1d', '#7f77dd', '#ba7517', '#185fa5', '#c0392b', '#6c757d'];
+        $swatchhtml = '<div class="lcc-color-picker" id="lcc-color-picker">'
+            . '<input type="color" id="lcc-color-native" value="#3a87ad" '
+            . 'aria-label="' . s(get_string('color', 'local_calendarcategories')) . '">'
+            . '<div class="lcc-color-swatches">';
+        foreach ($swatches as $swatch) {
+            $swatchhtml .= '<button type="button" class="lcc-color-swatch" '
+                . 'data-color="' . s($swatch) . '" style="background:' . s($swatch) . '" '
+                . 'aria-label="' . s($swatch) . '"></button>';
+        }
+        $swatchhtml .= '</div></div>';
+        $mform->addElement('html', $swatchhtml);
+        $mform->addElement('html', '<script>' . self::color_picker_js() . '</script>');
+
         $mform->addElement('text', 'sortorder', get_string('sortorder', 'local_calendarcategories'));
         $mform->setType('sortorder', PARAM_INT);
         $mform->setDefault('sortorder', 0);
+
+        $mform->addElement('advcheckbox', 'selfenrol', get_string('selfenrol', 'local_calendarcategories'));
+        $mform->setType('selfenrol', PARAM_BOOL);
+        $mform->setDefault('selfenrol', 0);
+        $mform->addHelpButton('selfenrol', 'selfenrol', 'local_calendarcategories');
 
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
@@ -89,6 +108,29 @@ class local_calendarcategories_edit_form extends moodleform {
             $errors['color'] = get_string('invalidcolor', 'local_calendarcategories');
         }
         return $errors;
+    }
+
+    /**
+     * JavaScript that keeps the native colour input, the swatch buttons and
+     * the hex text field in sync with each other.
+     *
+     * @return string Inline JavaScript, without surrounding <script> tags.
+     */
+    private static function color_picker_js(): string {
+        return '(function(){'
+            . 'var text=document.getElementById("id_color");'
+            . 'var native=document.getElementById("lcc-color-native");'
+            . 'var picker=document.getElementById("lcc-color-picker");'
+            . 'if(!text||!native||!picker)return;'
+            . 'function isvalid(v){return /^#[0-9a-fA-F]{6}$/.test(v);}'
+            . 'if(isvalid(text.value)){native.value=text.value;}'
+            . 'native.addEventListener("input",function(){text.value=native.value;});'
+            . 'text.addEventListener("input",function(){if(isvalid(text.value)){native.value=text.value;}});'
+            . 'picker.querySelectorAll(".lcc-color-swatch").forEach(function(btn){'
+            . 'btn.addEventListener("click",function(){'
+            . 'var c=btn.dataset.color;text.value=c;native.value=c;'
+            . '});});'
+            . '})();';
     }
 }
 // Process form.
@@ -114,7 +156,8 @@ if ($form->is_cancelled()) {
             $data->color,
             context_system::instance()->id,
             $data->description ?? '',
-            (int)($data->sortorder ?? 0)
+            (int)($data->sortorder ?? 0),
+            (bool)($data->selfenrol ?? false)
         );
         $msg = get_string('categorycreated', 'local_calendarcategories');
     }

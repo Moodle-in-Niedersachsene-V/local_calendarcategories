@@ -61,6 +61,18 @@ function xmldb_local_calendarcategories_upgrade(int $oldversion): bool {
     // Datenverlust nach, sofern sie nicht bereits vorhanden sind.
     local_calendarcategories_ensure_tables($dbman);
 
+    // Build 2026062848: Feld fuer optionalen Selbstbeitritt ergaenzt.
+    if ($oldversion < 2026062848) {
+        $table = new xmldb_table('local_calendarcategories_cats');
+        $field = new xmldb_field('selfenrol', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'sortorder');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2026062848, 'local', 'calendarcategories');
+    }
+
     return true;
 }
 
@@ -82,6 +94,7 @@ function local_calendarcategories_ensure_tables(database_manager $dbman): void {
         $table->add_field('color', XMLDB_TYPE_CHAR, '7', null, XMLDB_NOTNULL, null, '#3a87ad');
         $table->add_field('contextid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
         $table->add_field('sortorder', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('selfenrol', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
         $table->add_field('visible', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1');
         $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
         $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');

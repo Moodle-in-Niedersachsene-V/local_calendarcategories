@@ -100,6 +100,34 @@
     border: 1px solid rgba(0,0,0,.1);
 }
 
+.lcc-cat-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.lcc-cat-join,
+.lcc-cat-leave {
+    flex-shrink: 0;
+    font-size: .75rem;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.lcc-cat-join {
+    color: #0d6efd;
+}
+
+.lcc-cat-leave {
+    color: var(--bs-secondary, #6c757d);
+}
+
+.lcc-cat-join:hover,
+.lcc-cat-leave:hover {
+    text-decoration: underline;
+}
+
 .lcc-cat-check {
     margin-left: auto;
     font-size: .75rem;
@@ -532,4 +560,43 @@
 .lcc-empty i {
     font-size: 2.5rem;
     opacity: .35;
+}
+
+/* Color picker on the create/edit category form */
+.lcc-color-picker {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    margin: -.5rem 0 1rem;
+    flex-wrap: wrap;
+}
+
+.lcc-color-picker input[type="color"] {
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border: 1px solid var(--bs-border-color, #dee2e6);
+    border-radius: .375rem;
+    cursor: pointer;
+    background: none;
+}
+
+.lcc-color-swatches {
+    display: flex;
+    gap: .35rem;
+    flex-wrap: wrap;
+}
+
+.lcc-color-swatch {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 1px rgba(0,0,0,.15);
+    cursor: pointer;
+    padding: 0;
+}
+
+.lcc-color-swatch:hover {
+    box-shadow: 0 0 0 2px rgba(0,0,0,.35);
 }
