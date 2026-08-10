@@ -86,8 +86,9 @@ if ($categories) {
     ];
 
     foreach ($categories as $cat) {
-        $editurl   = new moodle_url('/local/calendarcategories/edit.php', ['id' => $cat->id]);
-        $deleteurl = new moodle_url(
+        $editurl    = new moodle_url('/local/calendarcategories/edit.php', ['id' => $cat->id]);
+        $membersurl = new moodle_url('/local/calendarcategories/members.php', ['categoryid' => $cat->id]);
+        $deleteurl  = new moodle_url(
             '/local/calendarcategories/manage.php',
             ['action' => 'delete', 'id' => $cat->id, 'sesskey' => sesskey()]
         );
@@ -109,9 +110,10 @@ if ($categories) {
                 ? $OUTPUT->pix_icon('i/valid', get_string('selfenrol', 'local_calendarcategories'))
                 : '–',
             $cat->visible
-                ? $OUTPUT->pix_icon('i/show', get_string('visible'))
-                : $OUTPUT->pix_icon('i/hide', get_string('notvisible')),
+                ? $OUTPUT->pix_icon('t/hide', get_string('visible'))
+                : $OUTPUT->pix_icon('t/show', get_string('notvisible')),
             html_writer::link($editurl, get_string('edit')) . ' | ' .
+            html_writer::link($membersurl, get_string('memberslink', 'local_calendarcategories')) . ' | ' .
             html_writer::link($toggleurl, $cat->visible ? get_string('hide') : get_string('show')) . ' | ' .
             html_writer::link(
                 $deleteurl,
