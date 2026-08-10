@@ -16,6 +16,8 @@
 
 namespace local_calendarcategories\output;
 
+use html_writer;
+
 /**
  * Renderer for local_calendarcategories views.
  *
@@ -32,7 +34,7 @@ class renderer {
      */
     public static function render_cat_list(array $categories): string {
         if (empty($categories)) {
-            return \html_writer::tag(
+            return html_writer::tag(
                 'p',
                 get_string('nocategories', 'local_calendarcategories'),
                 ['class' => 'small text-muted']
@@ -40,10 +42,10 @@ class renderer {
         }
         $out = '';
         foreach ($categories as $cat) {
-            $dot = \html_writer::span('', 'lcc-cat-dot', ['style' => 'background:' . s($cat->color)]);
-            $out .= \html_writer::tag(
+            $dot = html_writer::span('', 'lcc-cat-dot', ['style' => 'background:' . s($cat->color)]);
+            $out .= html_writer::tag(
                 'div',
-                $dot . \html_writer::span(format_string($cat->name)),
+                $dot . html_writer::span(format_string($cat->name)),
                 ['class' => 'lcc-cat-item active', 'title' => format_string($cat->name)]
             );
         }
@@ -97,7 +99,7 @@ class renderer {
             $classes = 'lcc-day'
                 . ($isthismonth ? '' : ' other-month')
                 . ($istoday ? ' today' : '');
-            $numel = \html_writer::div((string)$daynum, 'lcc-day-num', ['aria-label' => $celldate]);
+            $numel = html_writer::div((string)$daynum, 'lcc-day-num', ['aria-label' => $celldate]);
 
             $pillshtml = '';
             $dayevents = $evbydate[$celldate] ?? [];
@@ -105,16 +107,16 @@ class renderer {
             foreach ($dayevents as $ev) {
                 if ($shown >= 3) {
                     $more = count($dayevents) - 3;
-                    $pillshtml .= \html_writer::div(
+                    $pillshtml .= html_writer::div(
                         '+' . $more . ' ' . get_string('moreevents', 'local_calendarcategories'),
                         'lcc-more'
                     );
                     break;
                 }
                 $color    = s($ev->categorycolor);
-                $time     = \html_writer::span(date('H:i', $ev->timestart), 'lcc-pill-time');
+                $time     = html_writer::span(date('H:i', $ev->timestart), 'lcc-pill-time');
                 $pillurl = new \moodle_url('/local/calendarcategories/view.php', ['event' => $ev->id]);
-                $pillshtml .= \html_writer::tag(
+                $pillshtml .= html_writer::tag(
                     'a',
                     $time . ' ' . format_string($ev->name),
                     [
@@ -193,7 +195,7 @@ class renderer {
                 $inner       = '';
                 foreach ($slotevents as $ev) {
                     $color  = s($ev->categorycolor);
-                    $inner .= \html_writer::tag(
+                    $inner .= html_writer::tag(
                         'a',
                         '<span style="font-size:.65rem;opacity:.85">' . date('H:i', $ev->timestart) . '</span> '
                         . format_string($ev->name),
@@ -232,7 +234,7 @@ class renderer {
     ): string {
         if (empty($events)) {
             $btn = $canadd
-                ? \html_writer::tag(
+                ? html_writer::tag(
                     'a',
                     get_string('addevent', 'local_calendarcategories'),
                     ['href' => $addeventurl->out(), 'class' => 'btn btn-sm btn-primary']
@@ -265,7 +267,7 @@ class renderer {
             $daynum = date('j', $ev->timestart);
             $time    = date('H:i', $ev->timestart);
 
-            $out .= \html_writer::tag(
+            $out .= html_writer::tag(
                 'a',
                 '<div class="lcc-list-date">'
                 . '<div class="day">' . $daynum . '</div>'

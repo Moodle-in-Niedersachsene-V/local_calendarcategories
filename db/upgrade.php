@@ -54,5 +54,70 @@ function xmldb_local_calendarcategories_upgrade(int $oldversion): bool {
         upgrade_plugin_savepoint(true, 2026062837, 'local', 'calendarcategories');
     }
 
+    // Reparaturschritt fuer Installationen, bei denen ein frueherer Erstinstall
+    // nur den Versionseintrag angelegt, aber keine Tabellen erzeugt hat (zum
+    // Beispiel durch einen zwischenzeitlichen Fehler in install.xml). Der
+    // Schritt laeuft bei jedem Upgrade und legt fehlende Tabellen ohne
+    // Datenverlust nach, sofern sie nicht bereits vorhanden sind.
+    local_calendarcategories_ensure_tables($dbman);
+
     return true;
+}
+
+/**
+ * Create the plugin's tables if they are missing, matching db/install.xml.
+ *
+ * Idempotent: does nothing for tables that already exist.
+ *
+ * @param database_manager $dbman The Moodle database manager.
+ */
+function local_calendarcategories_ensure_tables(database_manager $dbman): void {
+
+    // Table local_calendarcategories_cats.
+    $table = new xmldb_table('local_calendarcategories_cats');
+    if (!$dbman->table_exists($table)) {
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL);
+        $table->add_field('description', XMLDB_TYPE_TEXT, null, null, null);
+        $table->add_field('color', XMLDB_TYPE_CHAR, '7', null, XMLDB_NOTNULL, null, '#3a87ad');
+        $table->add_field('contextid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('sortorder', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('visible', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('fk_context', XMLDB_KEY_FOREIGN, ['contextid'], 'context', ['id']);
+        $table->add_key('fk_usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+        $table->add_index('idx_contextid_visible', XMLDB_INDEX_NOTUNIQUE, ['contextid', 'visible']);
+        $dbman->create_table($table);
+    }
+
+    // Table local_calendarcategories_members.
+    $table = new xmldb_table('local_calendarcategories_members');
+    if (!$dbman->table_exists($table)) {
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
+        $table->add_field('categoryid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('fk_category', XMLDB_KEY_FOREIGN, ['categoryid'], 'local_calendarcategories_cats', ['id']);
+        $table->add_key('fk_user', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+        $table->add_index('idx_cat_user', XMLDB_INDEX_UNIQUE, ['categoryid', 'userid']);
+        $dbman->create_table($table);
+    }
+
+    // Table local_calendarcategories_events.
+    $table = new xmldb_table('local_calendarcategories_events');
+    if (!$dbman->table_exists($table)) {
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
+        $table->add_field('categoryid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('eventid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('fk_category', XMLDB_KEY_FOREIGN, ['categoryid'], 'local_calendarcategories_cats', ['id']);
+        $table->add_key('fk_event', XMLDB_KEY_FOREIGN, ['eventid'], 'event', ['id']);
+        $table->add_index('idx_cat_event', XMLDB_INDEX_UNIQUE, ['categoryid', 'eventid']);
+        $dbman->create_table($table);
+    }
 }
